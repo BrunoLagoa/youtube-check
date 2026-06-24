@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YouTube Check — Configurações</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <div class="page-wrapper">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-inner">
+        <div class="header-logo">
+          <img src="../../icons/icon-48.png" alt="" class="logo-icon" />
+          <div>
+            <h1 class="header-title">YouTube Check</h1>
+            <p class="header-subtitle">Configurações da extensão</p>
+          </div>
+        </div>
+        <div class="header-status" id="save-status" aria-live="polite"></div>
+      </div>
+    </header>
+
+    <main class="main">
+
+      <!-- Section: General -->
+      <section class="section" aria-labelledby="section-general">
+        <h2 class="section-title" id="section-general">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Geral
+        </h2>
+        <div class="section-body">
+
+          <!-- Enable toggle -->
+          <div class="setting-row">
+            <div class="setting-info">
+              <label class="setting-label" for="toggle-enabled">Ativar marcação visual</label>
+              <p class="setting-desc">Exibe badges nos vídeos já avaliados no YouTube.</p>
+            </div>
+            <label class="toggle" for="toggle-enabled">
+              <input type="checkbox" id="toggle-enabled" role="switch" aria-checked="true" />
+              <span class="toggle-thumb"></span>
+            </label>
+          </div>
+
+          <!-- Hide viewed -->
+          <div class="setting-row">
+            <div class="setting-info">
+              <label class="setting-label" for="toggle-hide">Ocultar vídeos visualizados</label>
+              <p class="setting-desc">Esconde vídeos já avaliados das listagens.</p>
+            </div>
+            <label class="toggle" for="toggle-hide">
+              <input type="checkbox" id="toggle-hide" role="switch" />
+              <span class="toggle-thumb"></span>
+            </label>
+          </div>
+
+          <!-- Highlight unviewed -->
+          <div class="setting-row">
+            <div class="setting-info">
+              <label class="setting-label" for="toggle-highlight">Destacar não visualizados</label>
+              <p class="setting-desc">Adiciona borda colorida em vídeos ainda não avaliados.</p>
+            </div>
+            <label class="toggle" for="toggle-highlight">
+              <input type="checkbox" id="toggle-highlight" role="switch" />
+              <span class="toggle-thumb"></span>
+            </label>
+          </div>
+
+          <!-- Show page counter -->
+          <div class="setting-row">
+            <div class="setting-info">
+              <label class="setting-label" for="toggle-counter">Exibir contador na página</label>
+              <p class="setting-desc">Mostra um widget flutuante com a proporção de vídeos assistidos/totais na listagem.</p>
+            </div>
+            <label class="toggle" for="toggle-counter">
+              <input type="checkbox" id="toggle-counter" role="switch" />
+              <span class="toggle-thumb"></span>
+            </label>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Section: Badge Appearance -->
+      <section class="section" aria-labelledby="section-appearance">
+        <h2 class="section-title" id="section-appearance">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="13.5" cy="6.5" r="2.5"/><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><path d="M17 11l2 2 4-4"/></svg>
+          Aparência do indicador
+        </h2>
+        <div class="section-body">
+
+          <!-- Display mode -->
+          <div class="setting-row setting-row--vertical">
+            <div class="setting-info">
+              <span class="setting-label">Modo de exibição</span>
+              <p class="setting-desc">Escolha como o indicador aparece sobre a thumbnail.</p>
+            </div>
+            <div class="radio-group" role="radiogroup" aria-label="Modo de exibição">
+              <label class="radio-card" for="mode-badge">
+                <input type="radio" name="displayMode" id="mode-badge" value="badge" />
+                <span class="radio-card-content">
+                  <span class="radio-preview radio-preview--badge">✓ Badge</span>
+                  <span class="radio-card-label">Badge</span>
+                </span>
+              </label>
+              <label class="radio-card" for="mode-overlay">
+                <input type="radio" name="displayMode" id="mode-overlay" value="overlay" />
+                <span class="radio-card-content">
+                  <span class="radio-preview radio-preview--overlay">✓ Overlay</span>
+                  <span class="radio-card-label">Overlay</span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Badge text -->
+          <div class="setting-row">
+            <div class="setting-info">
+              <label class="setting-label" for="input-badge-text">Texto do indicador</label>
+              <p class="setting-desc">Texto exibido no badge ou overlay.</p>
+            </div>
+            <input
+              type="text"
+              id="input-badge-text"
+              class="text-input"
+              placeholder="✓ Visualizado"
+              maxlength="30"
+              aria-label="Texto do indicador"
+            />
+          </div>
+
+          <!-- Badge color -->
+          <div class="setting-row">
+            <div class="setting-info">
+              <label class="setting-label" for="input-badge-color">Cor do indicador</label>
+              <p class="setting-desc">Cor principal do badge/overlay.</p>
+            </div>
+            <div class="color-picker-wrapper">
+              <input type="color" id="input-badge-color" class="color-input" value="#00b894" aria-label="Cor do indicador" />
+              <span class="color-value" id="color-hex">#00b894</span>
+            </div>
+          </div>
+
+          <!-- Preview -->
+          <div class="preview-section" aria-label="Preview do indicador">
+            <span class="preview-label">Preview</span>
+            <div class="preview-thumbnail">
+              <div class="preview-thumb-bg"></div>
+              <div class="preview-badge" id="preview-badge">✓ Visualizado</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Footer actions -->
+      <div class="footer-actions">
+        <button id="btn-reset" class="btn btn--secondary">Restaurar padrões</button>
+        <button id="btn-save" class="btn btn--primary">Salvar configurações</button>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="options-footer">
+    <span>Desenvolvido por</span>
+    <a href="https://www.brunocastro.dev" target="_blank" rel="noopener" class="footer-link">Bruno Castro</a>
+  </footer>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+  <script src="options.js"></script>
+</body>
+</html>

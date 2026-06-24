@@ -1,0 +1,326 @@
+/**
+ * YouTube Check — Content CSS
+ * Styles for injected badges and overlays on YouTube video thumbnails.
+ */
+
+/* ─── BADGE ──────────────────────────────────────────────────────────────────── */
+.ytcheck-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-family: 'Roboto', 'YouTube Sans', Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: var(--ytcheck-color, #00b894);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+  animation: ytcheck-badge-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+
+@keyframes ytcheck-badge-in {
+  from {
+    opacity: 0;
+    transform: scale(0.7) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ─── WATCH PAGE INDICATOR ───────────────────────────────────────────────────── */
+.ytcheck-watch-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  margin: 0 0 10px 0;
+  background: rgba(0, 184, 148, 0.08);
+  border: 1px solid rgba(0, 184, 148, 0.25);
+  border-radius: 10px;
+  font-family: 'Roboto', 'YouTube Sans', Arial, sans-serif;
+  animation: ytcheck-watch-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  cursor: default;
+  user-select: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ytcheck-watch-indicator.ytcheck-watch--disliked {
+  background: rgba(239, 83, 80, 0.07);
+  border-color: rgba(239, 83, 80, 0.22);
+}
+
+@keyframes ytcheck-watch-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ytcheck-watch-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: var(--ytcheck-color, #00b894);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.ytcheck-watch--disliked .ytcheck-watch-check {
+  background: #ef5350;
+}
+
+.ytcheck-watch-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: #aaa;
+  flex: 1;
+}
+
+.ytcheck-watch-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(0, 184, 148, 0.15);
+  color: var(--ytcheck-color, #00b894);
+  border: 1px solid rgba(0, 184, 148, 0.25);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ytcheck-watch--disliked .ytcheck-watch-pill {
+  background: rgba(239, 83, 80, 0.12);
+  color: #ef5350;
+  border-color: rgba(239, 83, 80, 0.22);
+}
+
+
+/* ─── OVERLAY ─────────────────────────────────────────────────────────────────── */
+.ytcheck-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: inherit;
+  pointer-events: none;
+  animation: ytcheck-overlay-in 0.2s ease both;
+}
+
+.ytcheck-overlay-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-family: 'Roboto', 'YouTube Sans', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #fff;
+  background: var(--ytcheck-color, #00b894);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+}
+
+
+@keyframes ytcheck-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ─── HOVER EFFECT ────────────────────────────────────────────────────────────── */
+ytd-thumbnail:hover .ytcheck-badge,
+a#thumbnail:hover .ytcheck-badge {
+  transform: scale(1.05);
+  transition: transform 0.15s ease;
+}
+
+/* ─── VIEWED CARD TINT ─────────────────────────────────────────────────────────── */
+[data-ytcheck-viewed="true"] ytd-thumbnail::after,
+[data-ytcheck-viewed="true"] a#thumbnail::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid var(--ytcheck-color, #00b894);
+  opacity: 0.4;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+[data-ytcheck-viewed="true"]:hover ytd-thumbnail::after,
+[data-ytcheck-viewed="true"]:hover a#thumbnail::after {
+  opacity: 0.7;
+}
+
+/* ─── PAGE COUNTER WIDGET ───────────────────────────────────────────────────── */
+#ytcheck-page-counter {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9998;
+  animation: ytcheck-counter-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes ytcheck-counter-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.85); }
+  to   { opacity: 1; transform: translateY(0)     scale(1); }
+}
+
+.ytcheck-counter-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px 10px 12px;
+  background: rgba(15, 15, 15, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.04);
+  cursor: default;
+  user-select: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ytcheck-counter-inner:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.08);
+}
+
+.ytcheck-counter-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--ytcheck-color, #00b894);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 900;
+  flex-shrink: 0;
+  font-family: Arial, sans-serif;
+}
+
+.ytcheck-counter-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.ytcheck-counter-nums {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f1f1f1;
+  font-family: 'YouTube Sans', 'Roboto', Arial, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.ytcheck-counter-sep {
+  font-size: 12px;
+  color: #666;
+  margin: 0 1px;
+  font-weight: 400;
+}
+
+.ytcheck-counter-label {
+  font-size: 10px;
+  color: #888;
+  font-family: 'YouTube Sans', 'Roboto', Arial, sans-serif;
+  white-space: nowrap;
+}
+
+/* Circular progress ring */
+.ytcheck-counter-ring {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.ytcheck-counter-ring svg {
+  width: 36px;
+  height: 36px;
+  transform: rotate(-90deg);
+}
+
+.ytcheck-ring-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 3;
+}
+
+.ytcheck-ring-fill {
+  fill: none;
+  stroke: var(--ytcheck-color, #00b894);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ytcheck-ring-pct {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--ytcheck-color, #00b894);
+  font-family: Arial, sans-serif;
+}
+
+/* ─── SHORTS PLAYER INDICATOR OVERLAY ────────────────────────────────────────── */
+.ytcheck-watch-indicator.ytcheck-shorts-player-indicator {
+  position: absolute;
+  top: 52px;
+  left: 16px;
+  width: auto;
+  max-width: 320px;
+  z-index: 1000;
+  background: rgba(15, 15, 15, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  border-radius: 12px;
+  padding: 8px 12px;
+  gap: 8px;
+}
+
+.ytcheck-watch-indicator.ytcheck-shorts-player-indicator .ytcheck-watch-text {
+  font-size: 11px;
+  color: #eee;
+}
+
+.ytcheck-watch-indicator.ytcheck-shorts-player-indicator .ytcheck-watch-pill {
+  font-size: 10px;
+  padding: 2px 8px;
+}
+
+
