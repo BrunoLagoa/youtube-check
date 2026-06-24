@@ -7,13 +7,11 @@
 
 chrome.runtime.onInstalled.addListener(async ({ reason }) => {
   if (reason === 'install') {
-    console.log('[YouTube Check] Extension installed.');
-    // Open options page on first install to let user configure
-    // chrome.runtime.openOptionsPage();
+    // First install — user can open options from the popup
   }
 
   if (reason === 'update') {
-    console.log('[YouTube Check] Extension updated.');
+    // Extension updated
   }
 });
 

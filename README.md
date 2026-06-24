@@ -68,3 +68,27 @@ youtube-check/
 - O vídeo precisa ser aberto ao menos uma vez para que a avaliação seja registrada
 - Dados salvos em `chrome.storage.local` (por dispositivo)
 - Configurações salvas em `chrome.storage.sync` (sincronizadas entre dispositivos)
+
+## Publicação na Chrome Web Store
+
+### Gerar pacote para upload
+
+```bash
+chmod +x scripts/package-extension.sh   # apenas na primeira vez
+npm run package
+# ou: ./scripts/package-extension.sh
+```
+
+O ZIP será criado em `dist/youtube-check-v1.1.0.zip`.
+
+### Documentação completa
+
+Consulte [docs/chrome-web-store.md](docs/chrome-web-store.md) para:
+
+- Textos prontos da listagem (descrição, permissões, propósito único)
+- Como hospedar a [política de privacidade](store/privacy-policy.html)
+- Checklist antes de enviar ao [Developer Dashboard](https://chrome.google.com/webstore/devconsole)
+
+### Política de privacidade
+
+Hospede o arquivo `store/privacy-policy.html` em uma URL HTTPS pública (ex.: GitHub Pages) e informe o link no painel da loja.

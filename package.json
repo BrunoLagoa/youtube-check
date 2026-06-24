@@ -1,0 +1,9 @@
+{
+  "name": "youtube-check",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Chrome extension that marks rated YouTube videos as viewed",
+  "scripts": {
+    "package": "bash scripts/package-extension.sh"
+  }
+}
