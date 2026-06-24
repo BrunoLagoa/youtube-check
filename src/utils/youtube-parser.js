@@ -246,6 +246,18 @@ const YTParser = (() => {
    * @param {Element} el
    * @returns {object|null}
    */
+  function _extractVideoIdFromMedia(el) {
+    for (const img of el.querySelectorAll('img[src*="/vi/"]')) {
+      const id = extractVideoId(img.getAttribute('src') || '');
+      if (id) return id;
+    }
+    for (const video of el.querySelectorAll('video[poster*="/vi/"]')) {
+      const id = extractVideoId(video.getAttribute('poster') || '');
+      if (id) return id;
+    }
+    return null;
+  }
+
   function _extractFromReelRenderer(el) {
     const anchor =
       el.querySelector('a[href*="/shorts/"]') ||
@@ -253,6 +265,10 @@ const YTParser = (() => {
       el.querySelector('a.yt-simple-endpoint[href]');
 
     let videoId = anchor ? extractVideoId(anchor.getAttribute('href') || '') : null;
+
+    if (!videoId) {
+      videoId = _extractVideoIdFromMedia(el);
+    }
 
     // Active reel may not expose href yet — fall back to URL
     if (!videoId && el.hasAttribute('is-active')) {

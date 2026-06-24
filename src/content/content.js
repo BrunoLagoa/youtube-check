@@ -43,6 +43,9 @@
   /** @type {boolean} Shorts monitoring listeners are active */
   let shortsMonitoringActive = false;
 
+  /** @type {Set<string>} Shorts seen in the current player session (scroll feed) */
+  let shortsSessionIds = new Set();
+
   // ─── CONTEXT GUARD ───────────────────────────────────────────────────────────
 
   /**
@@ -182,6 +185,7 @@
   function stopShortsMonitoring() {
     if (!shortsMonitoringActive) return;
     shortsMonitoringActive = false;
+    shortsSessionIds.clear();
 
     stopShortsUrlPolling();
     cleanupShortsActiveObserver();
@@ -202,7 +206,10 @@
    */
   function onShortsVideoChanged() {
     const videoId = YTParser.getCurrentShortsVideoId();
-    if (videoId) _lastHandledVideoId = videoId;
+    if (videoId) {
+      _lastHandledVideoId = videoId;
+      trackShortsInSession();
+    }
 
     removeWatchIndicator();
     ensureShortsLikeObserver();
@@ -213,6 +220,37 @@
       processAllVisibleVideos();
       scheduleCounterUpdate();
     }
+  }
+
+  /**
+   * Register every Short visible in the feed + current URL for session counter.
+   */
+  function trackShortsInSession() {
+    const currentId = YTParser.getCurrentShortsVideoId();
+    if (currentId) shortsSessionIds.add(currentId);
+
+    for (const reel of document.querySelectorAll('ytd-reel-video-renderer')) {
+      const data = YTParser.extractFromElement(reel);
+      if (data?.videoId) {
+        shortsSessionIds.add(data.videoId);
+        reel.dataset.ytcheckId = data.videoId;
+      }
+    }
+  }
+
+  /**
+   * Count viewed/total for the Shorts player session.
+   * @returns {{ total: number, viewed: number }}
+   */
+  function getShortsSessionCounts() {
+    trackShortsInSession();
+
+    let viewed = 0;
+    for (const id of shortsSessionIds) {
+      if (viewedIds.has(id)) viewed++;
+    }
+
+    return { total: shortsSessionIds.size, viewed };
   }
 
   /**
@@ -415,6 +453,10 @@
       viewedIds.add(videoId);
     } else {
       viewedIds.delete(videoId);
+    }
+
+    if (YTParser.isShortsPlayer()) {
+      shortsSessionIds.add(videoId);
     }
 
     // Update watch page indicator with fresh state
@@ -843,15 +885,16 @@
     let total = 0;
     let viewed = 0;
 
-    // Shorts player: one video at a time — use URL as source of truth
+    // Shorts: count all videos seen while scrolling this feed
     if (YTParser.isShortsPlayer()) {
-      const videoId = YTParser.getCurrentShortsVideoId();
-      if (!videoId) {
+      const counts = getShortsSessionCounts();
+      total = counts.total;
+      viewed = counts.viewed;
+
+      if (total === 0) {
         removePageCounter();
         return;
       }
-      total = 1;
-      viewed = viewedIds.has(videoId) ? 1 : 0;
     } else {
       const allCards = document.querySelectorAll(YTParser.VIDEO_ELEMENTS_SELECTOR);
       if (allCards.length === 0) {
