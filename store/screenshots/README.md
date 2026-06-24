@@ -2,6 +2,16 @@
 
 Coloque aqui as capturas de tela antes de enviar à loja.
 
+## Arquivos prontos para upload
+
+A pasta **`store-ready/`** contém versões já convertidas para a Chrome Web Store:
+
+- Tamanho: **1280×800**
+- Formato: **JPEG** (24 bits, sem transparência)
+- Arquivos: `screenshot1.jpg`, `screenshot2.jpg`, `screenshot3.jpg`, `screenshot5.jpg`
+
+Use esses arquivos em **Capturas de tela localizadas** no Developer Dashboard.
+
 ## Requisitos
 
 - Mínimo: **1 screenshot**
