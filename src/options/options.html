@@ -1,25 +1,25 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>YouTube Check — Configurações</title>
+  <title>YouTube Check — Settings</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="options.css" />
 </head>
-<body>
+<body data-page-title="optionsPageTitle">
   <div class="page-wrapper">
 
     <!-- Header -->
     <header class="header">
       <div class="header-inner">
         <div class="header-logo">
-          <img src="../../icons/icon-48.png" alt="" class="logo-icon" />
+          <img src="../../icons/icon-48.png" alt="" class="logo-icon" data-i18n-alt="extName" />
           <div>
-            <h1 class="header-title">YouTube Check</h1>
-            <p class="header-subtitle">Configurações da extensão</p>
+            <h1 class="header-title" data-i18n="extName">YouTube Check</h1>
+            <p class="header-subtitle" data-i18n="optionsSubtitle">Extension settings</p>
           </div>
         </div>
         <div class="header-status" id="save-status" aria-live="polite"></div>
@@ -28,19 +28,39 @@
 
     <main class="main">
 
+      <!-- Section: Language -->
+      <section class="section" aria-labelledby="section-language">
+        <h2 class="section-title" id="section-language">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span data-i18n="sectionLanguage">Language</span>
+        </h2>
+        <div class="section-body">
+          <div class="setting-row">
+            <div class="setting-info">
+              <label class="setting-label" for="select-locale" data-i18n="localeLabel">Interface language</label>
+              <p class="setting-desc" data-i18n="localeDesc">Language for the extension popup, settings, and on-page labels.</p>
+            </div>
+            <select id="select-locale" class="select-input" aria-label="Language">
+              <option value="auto" data-i18n="localeAuto">Automatic (browser)</option>
+              <option value="en" data-i18n="localeEn">English</option>
+              <option value="pt-BR" data-i18n="localePtBR">Português (Brasil)</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
       <!-- Section: General -->
       <section class="section" aria-labelledby="section-general">
         <h2 class="section-title" id="section-general">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          Geral
+          <span data-i18n="sectionGeneral">General</span>
         </h2>
         <div class="section-body">
 
-          <!-- Enable toggle -->
           <div class="setting-row">
             <div class="setting-info">
-              <label class="setting-label" for="toggle-enabled">Ativar marcação visual</label>
-              <p class="setting-desc">Exibe badges nos vídeos já avaliados no YouTube.</p>
+              <label class="setting-label" for="toggle-enabled" data-i18n="toggleEnabled">Enable visual marking</label>
+              <p class="setting-desc" data-i18n="toggleEnabledDesc">Shows badges on videos you have already rated on YouTube.</p>
             </div>
             <label class="toggle" for="toggle-enabled">
               <input type="checkbox" id="toggle-enabled" role="switch" aria-checked="true" />
@@ -48,11 +68,10 @@
             </label>
           </div>
 
-          <!-- Hide viewed -->
           <div class="setting-row">
             <div class="setting-info">
-              <label class="setting-label" for="toggle-hide">Ocultar vídeos visualizados</label>
-              <p class="setting-desc">Esconde vídeos já avaliados das listagens.</p>
+              <label class="setting-label" for="toggle-hide" data-i18n="toggleHide">Hide viewed videos</label>
+              <p class="setting-desc" data-i18n="toggleHideDesc">Hides already rated videos from listings.</p>
             </div>
             <label class="toggle" for="toggle-hide">
               <input type="checkbox" id="toggle-hide" role="switch" />
@@ -60,11 +79,10 @@
             </label>
           </div>
 
-          <!-- Highlight unviewed -->
           <div class="setting-row">
             <div class="setting-info">
-              <label class="setting-label" for="toggle-highlight">Destacar não visualizados</label>
-              <p class="setting-desc">Adiciona borda colorida em vídeos ainda não avaliados.</p>
+              <label class="setting-label" for="toggle-highlight" data-i18n="toggleHighlight">Highlight unviewed</label>
+              <p class="setting-desc" data-i18n="toggleHighlightDesc">Adds a colored border to videos not yet rated.</p>
             </div>
             <label class="toggle" for="toggle-highlight">
               <input type="checkbox" id="toggle-highlight" role="switch" />
@@ -72,11 +90,10 @@
             </label>
           </div>
 
-          <!-- Show page counter -->
           <div class="setting-row">
             <div class="setting-info">
-              <label class="setting-label" for="toggle-counter">Exibir contador na página</label>
-              <p class="setting-desc">Mostra um widget flutuante com a proporção de vídeos assistidos/totais na listagem.</p>
+              <label class="setting-label" for="toggle-counter" data-i18n="toggleCounter">Show page counter</label>
+              <p class="setting-desc" data-i18n="toggleCounterDesc">Shows a floating widget with the viewed/total ratio on the current listing.</p>
             </div>
             <label class="toggle" for="toggle-counter">
               <input type="checkbox" id="toggle-counter" role="switch" />
@@ -91,92 +108,88 @@
       <section class="section" aria-labelledby="section-appearance">
         <h2 class="section-title" id="section-appearance">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="13.5" cy="6.5" r="2.5"/><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><path d="M17 11l2 2 4-4"/></svg>
-          Aparência do indicador
+          <span data-i18n="sectionAppearance">Indicator appearance</span>
         </h2>
         <div class="section-body">
 
-          <!-- Display mode -->
           <div class="setting-row setting-row--vertical">
             <div class="setting-info">
-              <span class="setting-label">Modo de exibição</span>
-              <p class="setting-desc">Escolha como o indicador aparece sobre a thumbnail.</p>
+              <span class="setting-label" data-i18n="displayMode">Display mode</span>
+              <p class="setting-desc" data-i18n="displayModeDesc">Choose how the indicator appears on the thumbnail.</p>
             </div>
-            <div class="radio-group" role="radiogroup" aria-label="Modo de exibição">
+            <div class="radio-group" role="radiogroup" data-i18n-aria-label="displayMode">
               <label class="radio-card" for="mode-badge">
                 <input type="radio" name="displayMode" id="mode-badge" value="badge" />
                 <span class="radio-card-content">
                   <span class="radio-preview radio-preview--badge">✓ Badge</span>
-                  <span class="radio-card-label">Badge</span>
+                  <span class="radio-card-label" data-i18n="modeBadge">Badge</span>
                 </span>
               </label>
               <label class="radio-card" for="mode-overlay">
                 <input type="radio" name="displayMode" id="mode-overlay" value="overlay" />
                 <span class="radio-card-content">
                   <span class="radio-preview radio-preview--overlay">✓ Overlay</span>
-                  <span class="radio-card-label">Overlay</span>
+                  <span class="radio-card-label" data-i18n="modeOverlay">Overlay</span>
                 </span>
               </label>
             </div>
           </div>
 
-          <!-- Badge text -->
           <div class="setting-row">
             <div class="setting-info">
-              <label class="setting-label" for="input-badge-text">Texto do indicador</label>
-              <p class="setting-desc">Texto exibido no badge ou overlay.</p>
+              <label class="setting-label" for="input-badge-text" data-i18n="badgeText">Indicator text</label>
+              <p class="setting-desc" data-i18n="badgeTextDesc">Text shown on the badge or overlay.</p>
             </div>
             <input
               type="text"
               id="input-badge-text"
               class="text-input"
-              placeholder="✓ Visualizado"
+              data-i18n-placeholder="badgeTextPlaceholder"
               maxlength="30"
-              aria-label="Texto do indicador"
+              data-i18n-aria-label="badgeText"
             />
           </div>
 
-          <!-- Badge color -->
           <div class="setting-row">
             <div class="setting-info">
-              <label class="setting-label" for="input-badge-color">Cor do indicador</label>
-              <p class="setting-desc">Cor principal do badge/overlay.</p>
+              <label class="setting-label" for="input-badge-color" data-i18n="badgeColor">Indicator color</label>
+              <p class="setting-desc" data-i18n="badgeColorDesc">Main color of the badge/overlay.</p>
             </div>
             <div class="color-picker-wrapper">
-              <input type="color" id="input-badge-color" class="color-input" value="#00b894" aria-label="Cor do indicador" />
+              <input type="color" id="input-badge-color" class="color-input" value="#00b894" data-i18n-aria-label="badgeColor" />
               <span class="color-value" id="color-hex">#00b894</span>
             </div>
           </div>
 
-          <!-- Preview -->
-          <div class="preview-section" aria-label="Preview do indicador">
-            <span class="preview-label">Preview</span>
+          <div class="preview-section" data-i18n-aria-label="previewSection">
+            <span class="preview-label" data-i18n="preview">Preview</span>
             <div class="preview-thumbnail">
               <div class="preview-thumb-bg"></div>
-              <div class="preview-badge" id="preview-badge">✓ Visualizado</div>
+              <div class="preview-badge" id="preview-badge">✓ Viewed</div>
             </div>
           </div>
 
         </div>
       </section>
 
-      <!-- Footer actions -->
       <div class="footer-actions">
-        <button id="btn-reset" class="btn btn--secondary">Restaurar padrões</button>
-        <button id="btn-save" class="btn btn--primary">Salvar configurações</button>
+        <button id="btn-reset" class="btn btn--secondary" data-i18n="btnReset">Restore defaults</button>
+        <button id="btn-save" class="btn btn--primary" data-i18n="btnSave">Save settings</button>
       </div>
 
     </main>
   </div>
 
-  <!-- Footer -->
   <footer class="options-footer">
-    <span>Desenvolvido por</span>
+    <span data-i18n="developedBy">Developed by</span>
     <a href="https://www.brunocastro.dev" target="_blank" rel="noopener" class="footer-link">Bruno Castro</a>
   </footer>
 
-  <!-- Toast -->
   <div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
+  <script src="../i18n/messages.js"></script>
+  <script src="../i18n/i18n.js"></script>
+  <script src="../storage/storage.js"></script>
   <script src="options.js"></script>
 </body>
 </html>

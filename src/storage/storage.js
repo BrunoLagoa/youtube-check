@@ -44,12 +44,33 @@ const YTCheckStorage = (() => {
   const DEFAULT_SETTINGS = {
     enabled: true,
     badgeColor: '#00b894',
-    badgeText: '✓ Visualizado',
+    badgeText: '',
     displayMode: 'badge',       // 'badge' | 'overlay'
     hideViewed: false,
     highlightUnviewed: false,
     showPageCounter: true,
+    locale: 'auto',             // 'auto' | 'en' | 'pt-BR'
   };
+
+  /**
+   * Resolve badgeText and locale-aware defaults when loading settings.
+   * @param {object} stored
+   * @returns {object}
+   */
+  function normalizeSettings(stored) {
+    const merged = { ...DEFAULT_SETTINGS, ...stored };
+    const locale = typeof YTCheckI18n !== 'undefined'
+      ? YTCheckI18n.resolveLocale(merged.locale)
+      : (merged.locale === 'pt-BR' ? 'pt-BR' : 'en');
+
+    if (!merged.badgeText || YTCheckI18n?.isDefaultBadgeText(merged.badgeText)) {
+      merged.badgeText = typeof YTCheckI18n !== 'undefined'
+        ? YTCheckI18n.getDefaultBadgeText(locale)
+        : (locale === 'pt-BR' ? '✓ Visualizado' : '✓ Viewed');
+    }
+
+    return merged;
+  }
 
   // ─── VIDEO STORAGE (chrome.storage.local) ────────────────────────────────────
 
@@ -207,9 +228,9 @@ const YTCheckStorage = (() => {
   async function getSettings() {
     return safeStorage((resolve) => {
       chrome.storage.sync.get(['settings'], (result) => {
-        resolve({ ...DEFAULT_SETTINGS, ...(result.settings || {}) });
+        resolve(normalizeSettings(result.settings || {}));
       });
-    }, { ...DEFAULT_SETTINGS });
+    }, normalizeSettings({}));
   }
 
   /**
@@ -229,8 +250,15 @@ const YTCheckStorage = (() => {
    * @returns {Promise<void>}
    */
   async function resetSettings() {
+    const locale = typeof YTCheckI18n !== 'undefined' ? YTCheckI18n.getLocale() : 'en';
+    const reset = {
+      ...DEFAULT_SETTINGS,
+      badgeText: typeof YTCheckI18n !== 'undefined'
+        ? YTCheckI18n.getDefaultBadgeText(locale)
+        : '✓ Viewed',
+    };
     return safeStorage((resolve) => {
-      chrome.storage.sync.set({ settings: DEFAULT_SETTINGS }, resolve);
+      chrome.storage.sync.set({ settings: reset }, resolve);
     });
   }
 

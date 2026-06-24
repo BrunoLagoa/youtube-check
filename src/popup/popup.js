@@ -61,7 +61,7 @@ function animateNumber(el, target) {
   function step(now) {
     const elapsed = now - startTime;
     const progress = Math.min(elapsed / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3); // ease-out-cubic
+    const eased = 1 - Math.pow(1 - progress, 3);
     el.textContent = Math.round(start + (target - start) * eased);
     if (progress < 1) requestAnimationFrame(step);
   }
@@ -87,29 +87,6 @@ async function refreshStats() {
 
 // ─── HISTORY ──────────────────────────────────────────────────────────────────
 
-/**
- * Format a timestamp as a relative or absolute date string.
- * @param {number} ts - Unix timestamp in milliseconds
- */
-function formatDate(ts) {
-  if (!ts) return '';
-  const now = Date.now();
-  const diff = now - ts;
-  const min = Math.floor(diff / 60000);
-  const hr  = Math.floor(diff / 3600000);
-  const day = Math.floor(diff / 86400000);
-
-  if (min < 1)  return 'agora';
-  if (min < 60) return `${min}min`;
-  if (hr  < 24) return `${hr}h`;
-  if (day < 7)  return `${day}d`;
-  return new Date(ts).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-}
-
-/**
- * Render the recent video history list.
- * Shows the 10 most recently updated viewed videos, sorted by updatedAt desc.
- */
 async function renderHistory() {
   const data = await new Promise((resolve) => {
     chrome.storage.local.get(['videos'], (r) => resolve(r.videos || {}));
@@ -121,9 +98,9 @@ async function renderHistory() {
     .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))
     .slice(0, 10);
 
-  // Update count badge
-  els.historyCount.textContent = all.filter((v) => v.viewed).length > 0
-    ? `${all.filter((v) => v.viewed).length} vídeos`
+  const viewedCount = all.filter((v) => v.viewed).length;
+  els.historyCount.textContent = viewedCount > 0
+    ? YTCheckI18n.t('videosCount', viewedCount)
     : '';
 
   if (viewed.length === 0) {
@@ -141,8 +118,8 @@ async function renderHistory() {
     const thumbSrc = video.thumbnail || `https://i.ytimg.com/vi/${video.videoId}/mqdefault.jpg`;
 
     const statusBadge = video.liked
-      ? `<span class="history-badge history-badge--liked">👍 Curtido</span>`
-      : `<span class="history-badge history-badge--disliked">👎 Não curtido</span>`;
+      ? `<span class="history-badge history-badge--liked">👍 ${YTCheckI18n.t('liked')}</span>`
+      : `<span class="history-badge history-badge--disliked">👎 ${YTCheckI18n.t('disliked')}</span>`;
 
     li.innerHTML = `
       <a class="history-item" href="${video.url || `https://youtube.com/watch?v=${video.videoId}`}" target="_blank" title="${video.title || video.videoId}">
@@ -155,7 +132,7 @@ async function renderHistory() {
           <div class="history-meta">
             ${video.channel ? `<span class="history-channel">${video.channel}</span>` : ''}
             ${statusBadge}
-            <span class="history-date">${formatDate(video.updatedAt)}</span>
+            <span class="history-date">${YTCheckI18n.formatDate(video.updatedAt)}</span>
           </div>
         </div>
       </a>
@@ -166,7 +143,6 @@ async function renderHistory() {
 
 // ─── ACTIONS ──────────────────────────────────────────────────────────────────
 
-/** Send a message to the active YouTube tab */
 async function sendToYouTube(action) {
   return new Promise((resolve) => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -191,7 +167,6 @@ async function sendToYouTube(action) {
   });
 }
 
-// Refresh
 els.btnRefresh.addEventListener('click', async () => {
   els.btnRefresh.classList.add('loading');
 
@@ -199,10 +174,12 @@ els.btnRefresh.addEventListener('click', async () => {
   await refreshStats();
 
   els.btnRefresh.classList.remove('loading');
-  showToast(res ? 'Badges atualizados!' : 'Estatísticas atualizadas!', 'success');
+  showToast(
+    res ? YTCheckI18n.t('badgesUpdated') : YTCheckI18n.t('statsUpdated'),
+    'success'
+  );
 });
 
-// Export JSON
 els.btnExport.addEventListener('click', async () => {
   chrome.storage.local.get(['videos'], (result) => {
     const data = {
@@ -220,11 +197,10 @@ els.btnExport.addEventListener('click', async () => {
     a.click();
     URL.revokeObjectURL(url);
 
-    showToast('Exportado com sucesso!', 'success');
+    showToast(YTCheckI18n.t('exportSuccess'), 'success');
   });
 });
 
-// Import JSON
 els.btnImport.addEventListener('click', () => {
   els.importFile.click();
 });
@@ -241,43 +217,38 @@ els.importFile.addEventListener('change', (e) => {
       const incoming = parsed.videos || parsed;
 
       if (typeof incoming !== 'object' || Array.isArray(incoming)) {
-        showToast('Formato de arquivo inválido.', 'error');
+        showToast(YTCheckI18n.t('invalidFile'), 'error');
         return;
       }
 
       chrome.storage.local.get(['videos'], (result) => {
         const videos = { ...(result.videos || {}), ...incoming };
-        // Recalculate viewed for all
         for (const id of Object.keys(videos)) {
           videos[id].viewed = !!(videos[id].liked || videos[id].disliked);
         }
         chrome.storage.local.set({ videos }, async () => {
           await refreshStats();
-          showToast(`${Object.keys(incoming).length} vídeos importados!`, 'success');
+          showToast(YTCheckI18n.t('videosImported', Object.keys(incoming).length), 'success');
         });
       });
     } catch {
-      showToast('Erro ao ler o arquivo JSON.', 'error');
+      showToast(YTCheckI18n.t('jsonError'), 'error');
     }
-    // Reset file input
     els.importFile.value = '';
   };
   reader.readAsText(file);
 });
 
-// Clear
 els.btnClear.addEventListener('click', () => {
-  if (!confirm('Tem certeza que deseja limpar todo o histórico de vídeos?')) return;
+  if (!confirm(YTCheckI18n.t('confirmClear'))) return;
 
   chrome.storage.local.set({ videos: {} }, async () => {
     await refreshStats();
-    // Notify content script if on YouTube
     sendToYouTube('clearHistory');
-    showToast('Histórico limpo!', 'success');
+    showToast(YTCheckI18n.t('historyCleared'), 'success');
   });
 });
 
-// Settings
 els.btnSettings.addEventListener('click', () => {
   chrome.runtime.openOptionsPage();
   window.close();
@@ -285,4 +256,9 @@ els.btnSettings.addEventListener('click', () => {
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 
-refreshStats();
+(async function init() {
+  const settings = await YTCheckStorage.getSettings();
+  YTCheckI18n.init(settings);
+  document.title = YTCheckI18n.t('extName');
+  refreshStats();
+})();

@@ -1,0 +1,8 @@
+{
+  "extName": {
+    "message": "YouTube Check"
+  },
+  "extDescription": {
+    "message": "Marks YouTube videos you've rated (Like or Dislike) with a Viewed badge on thumbnails across the platform."
+  }
+}

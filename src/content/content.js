@@ -16,6 +16,12 @@
   /** @type {object} Current extension settings */
   let settings = await YTCheckStorage.getSettings();
 
+  function applyI18nFromSettings() {
+    YTCheckI18n.setLocale(YTCheckI18n.resolveLocale(settings.locale));
+  }
+
+  applyI18nFromSettings();
+
   /** @type {MutationObserver|null} Observer for like/dislike buttons */
   let likeObserver = null;
 
@@ -124,6 +130,7 @@
    */
   async function _executePageChange(url) {
     settings = await YTCheckStorage.getSettings();
+    applyI18nFromSettings();
 
     const videoId = YTParser.extractVideoId(url);
     const isShorts = YTParser.isShortsPlayer();
@@ -531,7 +538,7 @@
     }
 
     const icon   = liked ? '👍' : '👎';
-    const label  = liked ? 'Curtido' : 'Não curtido';
+    const label  = liked ? YTCheckI18n.t('liked') : YTCheckI18n.t('disliked');
     const cls    = liked ? 'ytcheck-watch--liked' : 'ytcheck-watch--disliked';
     const shortsCls = isShorts ? 'ytcheck-shorts-player-indicator' : '';
 
@@ -539,7 +546,7 @@
     _watchIndicatorEl.style.setProperty('--ytcheck-color', settings.badgeColor);
     _watchIndicatorEl.innerHTML = `
       <span class="ytcheck-watch-check">✓</span>
-      <span class="ytcheck-watch-text">Você já avaliou este vídeo</span>
+      <span class="ytcheck-watch-text">${YTCheckI18n.t('alreadyRatedVideo')}</span>
       <span class="ytcheck-watch-pill">${icon} ${label}</span>
     `;
   }
@@ -787,6 +794,7 @@
     removeAllBadges();
     viewedIds = await YTCheckStorage.getViewedIds();
     settings = await YTCheckStorage.getSettings();
+    applyI18nFromSettings();
 
     if (!settings.enabled) return;
 
@@ -800,6 +808,17 @@
 
     // Also re-scan all visible (some might not have been tagged yet)
     processAllVisibleVideos();
+
+    // Refresh on-page labels with new locale
+    const videoId = YTParser.isShortsPlayer()
+      ? YTParser.getCurrentShortsVideoId()
+      : YTParser.getCurrentVideoId();
+    if (videoId) {
+      const record = await YTCheckStorage.getVideo(videoId);
+      if (record?.viewed) {
+        updateWatchIndicator(record.liked, record.disliked);
+      }
+    }
   }
 
   // ─── MESSAGE HANDLER ─────────────────────────────────────────────────────────
@@ -934,7 +953,7 @@
         <span class="ytcheck-counter-check">✓</span>
         <div class="ytcheck-counter-text">
           <span class="ytcheck-counter-nums">${viewed}<span class="ytcheck-counter-sep">/</span>${total}</span>
-          <span class="ytcheck-counter-label">vistos nesta página</span>
+          <span class="ytcheck-counter-label">${YTCheckI18n.t('viewedOnPage')}</span>
         </div>
         <div class="ytcheck-counter-ring" style="--pct:${pct}">
           <svg viewBox="0 0 36 36">

@@ -1,37 +1,39 @@
 # YouTube Check 🎬✓
 
-Extensão Chrome que marca automaticamente vídeos do YouTube já avaliados (Like ou Dislike) como **Visualizados**, adicionando badges visuais nas thumbnails em toda a plataforma.
+> **Languages:** English | [Português (Brasil)](README.pt-BR.md)
 
-## Funcionalidades
+Chrome extension that automatically marks YouTube videos you've already rated (Like or Dislike) as **Viewed**, adding visual badges to thumbnails across the platform.
 
-- ✅ Detecta automaticamente vídeos curtidos ou não curtidos
-- ✅ Badge visual "✓ Visualizado" nas thumbnails
-- ✅ Funciona em Home, Busca, Canal, Playlists, Relacionados, Inscrições, Explorar, Shorts
-- ✅ MutationObserver para scroll infinito sem recarregar
-- ✅ Popup com estatísticas e ações (exportar/importar/limpar)
-- ✅ Página de configurações (cor, texto, modo badge/overlay, ocultar visualizados)
-- ✅ Persistência via `chrome.storage.local` e `chrome.storage.sync`
-- ✅ Manifest V3 + Performance otimizada
+## Features
 
-## Instalação
+- ✅ Automatically detects liked or disliked videos
+- ✅ Visual "✓ Viewed" badge on thumbnails
+- ✅ Works on Home, Search, Channel, Playlists, Related, Subscriptions, Explore, Shorts
+- ✅ MutationObserver for infinite scroll without reloading
+- ✅ Popup with statistics and actions (export/import/clear)
+- ✅ Settings page (color, text, badge/overlay mode, hide viewed)
+- ✅ Persistence via `chrome.storage.local` and `chrome.storage.sync`
+- ✅ Manifest V3 + optimized performance
 
-### Modo Desenvolvedor
+## Installation
 
-1. Abra o Chrome e acesse `chrome://extensions`
-2. Ative o **Modo de desenvolvedor** (toggle no canto superior direito)
-3. Clique em **"Carregar sem compactação"**
-4. Selecione a pasta `youtube-check/`
-5. A extensão estará ativa — acesse o YouTube!
+### Developer Mode
 
-## Como usar
+1. Open Chrome and go to `chrome://extensions`
+2. Enable **Developer mode** (toggle in the top-right corner)
+3. Click **"Load unpacked"**
+4. Select the `youtube-check/` folder
+5. The extension is active — open YouTube!
 
-1. **Abra qualquer vídeo** no YouTube e dê Like ou Dislike
-2. A extensão detecta automaticamente a avaliação e salva localmente
-3. Ao navegar pelo YouTube (Home, Busca, etc.), vídeos avaliados aparecem com o badge **✓ Visualizado**
-4. Clique no ícone da extensão para ver estatísticas
-5. Acesse **Configurações** para personalizar a aparência
+## How to use
 
-## Estrutura de arquivos
+1. **Open any video** on YouTube and give it a Like or Dislike
+2. The extension automatically detects the rating and saves it locally
+3. When browsing YouTube (Home, Search, etc.), rated videos show the **✓ Viewed** badge
+4. Click the extension icon to see statistics
+5. Open **Settings** to customize the appearance
+
+## File structure
 
 ```
 youtube-check/
@@ -62,33 +64,35 @@ youtube-check/
         └── dom-observer.js
 ```
 
-## Notas técnicas
+## Technical notes
 
-- A detecção de like/dislike usa o atributo `aria-pressed` e `is-toggled` dos botões do YouTube
-- O vídeo precisa ser aberto ao menos uma vez para que a avaliação seja registrada
-- Dados salvos em `chrome.storage.local` (por dispositivo)
-- Configurações salvas em `chrome.storage.sync` (sincronizadas entre dispositivos)
+- Like/dislike detection uses the `aria-pressed` attribute and `is-toggled` class on YouTube buttons
+- The video must be opened at least once for the rating to be recorded
+- Data is stored in `chrome.storage.local` (per device)
+- Settings are stored in `chrome.storage.sync` (synced across devices)
 
-## Publicação na Chrome Web Store
+## Chrome Web Store publishing
 
-### Gerar pacote para upload
+### Generate upload package
 
 ```bash
-chmod +x scripts/package-extension.sh   # apenas na primeira vez
+chmod +x scripts/package-extension.sh   # first time only
 npm run package
-# ou: ./scripts/package-extension.sh
+# or: ./scripts/package-extension.sh
 ```
 
-O ZIP será criado em `dist/youtube-check-v1.1.0.zip`.
+The ZIP will be created at `dist/youtube-check-v1.1.0.zip`.
 
-### Documentação completa
+### Full documentation
 
-Consulte [docs/chrome-web-store.md](docs/chrome-web-store.md) para:
+See [docs/chrome-web-store.md](docs/chrome-web-store.md) for:
 
-- Textos prontos da listagem (descrição, permissões, propósito único)
-- Como hospedar a [política de privacidade](store/privacy-policy.html)
-- Checklist antes de enviar ao [Developer Dashboard](https://chrome.google.com/webstore/devconsole)
+- Ready-to-use listing texts (description, permissions, single purpose)
+- How to host the [privacy policy](store/privacy-policy.html)
+- Checklist before submitting to the [Developer Dashboard](https://chrome.google.com/webstore/devconsole)
 
-### Política de privacidade
+### Privacy policy
 
-Hospede o arquivo `store/privacy-policy.html` em uma URL HTTPS pública (ex.: GitHub Pages) e informe o link no painel da loja.
+Host `store/privacy-policy.html` at a public HTTPS URL (e.g. GitHub Pages) and provide the link in the store dashboard.
+
+**Live URL:** https://brunolagoa.github.io/youtube-check/store/privacy-policy.html

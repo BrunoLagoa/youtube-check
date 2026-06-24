@@ -3,21 +3,12 @@
  * Loads and persists extension settings via chrome.storage.sync.
  */
 
-// ─── DEFAULTS ─────────────────────────────────────────────────────────────────
-
-const DEFAULT_SETTINGS = {
-  enabled: true,
-  badgeColor: '#00b894',
-  badgeText: '✓ Visualizado',
-  displayMode: 'badge',
-  hideViewed: false,
-  highlightUnviewed: false,
-  showPageCounter: true,
-};
+const DEFAULT_SETTINGS = YTCheckStorage.DEFAULT_SETTINGS;
 
 // ─── ELEMENTS ─────────────────────────────────────────────────────────────────
 
 const els = {
+  locale:         document.getElementById('select-locale'),
   enabled:        document.getElementById('toggle-enabled'),
   hideViewed:     document.getElementById('toggle-hide'),
   highlightUnviewed: document.getElementById('toggle-highlight'),
@@ -34,6 +25,8 @@ const els = {
   saveStatus:     document.getElementById('save-status'),
 };
 
+let previousLocale = 'auto';
+
 // ─── TOAST ────────────────────────────────────────────────────────────────────
 
 let toastTimer = null;
@@ -45,16 +38,32 @@ function showToast(message, type = 'default') {
   toastTimer = setTimeout(() => els.toast.classList.remove('visible'), 2800);
 }
 
+// ─── I18N UI ──────────────────────────────────────────────────────────────────
+
+function applyI18n(settings) {
+  YTCheckI18n.init(settings);
+  document.title = YTCheckI18n.t('optionsPageTitle');
+
+  // Re-translate <option> labels (not covered by data-i18n on parent)
+  els.locale.querySelectorAll('option[data-i18n]').forEach((opt) => {
+    opt.textContent = YTCheckI18n.t(opt.dataset.i18n);
+  });
+  els.locale.setAttribute('aria-label', YTCheckI18n.t('localeLabel'));
+}
+
 // ─── LOAD SETTINGS ────────────────────────────────────────────────────────────
 
 function applySettingsToUI(settings) {
-  els.enabled.checked          = settings.enabled;
-  els.hideViewed.checked       = settings.hideViewed;
+  els.locale.value = settings.locale || 'auto';
+  previousLocale = settings.locale || 'auto';
+
+  els.enabled.checked = settings.enabled;
+  els.hideViewed.checked = settings.hideViewed;
   els.highlightUnviewed.checked = settings.highlightUnviewed;
-  els.showPageCounter.checked  = settings.showPageCounter !== false; // Default to true
-  els.badgeText.value          = settings.badgeText;
-  els.badgeColor.value         = settings.badgeColor;
-  els.colorHex.textContent     = settings.badgeColor;
+  els.showPageCounter.checked = settings.showPageCounter !== false;
+  els.badgeText.value = settings.badgeText;
+  els.badgeColor.value = settings.badgeColor;
+  els.colorHex.textContent = settings.badgeColor;
 
   if (settings.displayMode === 'overlay') {
     els.modeOverlay.checked = true;
@@ -66,23 +75,36 @@ function applySettingsToUI(settings) {
 }
 
 async function loadSettings() {
-  chrome.storage.sync.get(['settings'], (result) => {
-    const settings = { ...DEFAULT_SETTINGS, ...(result.settings || {}) };
-    applySettingsToUI(settings);
-  });
+  const settings = await YTCheckStorage.getSettings();
+  applyI18n(settings);
+  applySettingsToUI(settings);
 }
 
 // ─── COLLECT SETTINGS FROM UI ─────────────────────────────────────────────────
 
 function collectSettings() {
+  const locale = els.locale.value || 'auto';
+  const resolvedLocale = YTCheckI18n.resolveLocale(locale);
+  const defaultBadge = YTCheckI18n.getDefaultBadgeText(resolvedLocale);
+  const badgeTextInput = els.badgeText.value.trim();
+
+  let badgeText = badgeTextInput || defaultBadge;
+
+  // Update default badge text when locale changes and user kept the default
+  if (locale !== previousLocale && YTCheckI18n.isDefaultBadgeText(badgeTextInput)) {
+    badgeText = defaultBadge;
+    els.badgeText.value = badgeText;
+  }
+
   return {
-    enabled:           els.enabled.checked,
-    hideViewed:        els.hideViewed.checked,
+    locale,
+    enabled: els.enabled.checked,
+    hideViewed: els.hideViewed.checked,
     highlightUnviewed: els.highlightUnviewed.checked,
-    showPageCounter:   els.showPageCounter.checked,
-    badgeText:         els.badgeText.value.trim() || DEFAULT_SETTINGS.badgeText,
-    badgeColor:        els.badgeColor.value,
-    displayMode:       els.modeOverlay.checked ? 'overlay' : 'badge',
+    showPageCounter: els.showPageCounter.checked,
+    badgeText,
+    badgeColor: els.badgeColor.value,
+    displayMode: els.modeOverlay.checked ? 'overlay' : 'badge',
   };
 }
 
@@ -90,14 +112,13 @@ function collectSettings() {
 
 function updatePreview(settings) {
   const color = settings?.badgeColor || els.badgeColor.value;
-  const text  = settings?.badgeText  || els.badgeText.value || DEFAULT_SETTINGS.badgeText;
-  const mode  = settings?.displayMode || (els.modeOverlay.checked ? 'overlay' : 'badge');
+  const text = settings?.badgeText || els.badgeText.value || YTCheckI18n.getDefaultBadgeText();
+  const mode = settings?.displayMode || (els.modeOverlay.checked ? 'overlay' : 'badge');
 
   els.previewBadge.textContent = text;
   els.previewBadge.style.setProperty('--preview-color', color);
   els.previewBadge.style.background = color;
 
-  // Adjust preview for overlay mode
   const thumb = els.previewBadge.closest('.preview-thumbnail');
   if (mode === 'overlay') {
     els.previewBadge.style.top = '50%';
@@ -120,12 +141,13 @@ function updatePreview(settings) {
 
 async function saveSettings() {
   const settings = collectSettings();
+  previousLocale = settings.locale;
 
   return new Promise((resolve) => {
     chrome.storage.sync.set({ settings }, () => {
-      resolve();
-      // Notify all YouTube content scripts
+      applyI18n(settings);
       notifyContentScripts();
+      resolve();
     });
   });
 }
@@ -140,7 +162,6 @@ function notifyContentScripts() {
 
 // ─── EVENT LISTENERS ──────────────────────────────────────────────────────────
 
-// Live preview on changes
 els.badgeColor.addEventListener('input', () => {
   els.colorHex.textContent = els.badgeColor.value;
   updatePreview();
@@ -151,31 +172,52 @@ els.badgeText.addEventListener('input', () => updatePreview());
 els.modeBadge.addEventListener('change', () => updatePreview());
 els.modeOverlay.addEventListener('change', () => updatePreview());
 
-// Save button
+els.locale.addEventListener('change', async () => {
+  const settings = collectSettings();
+  applyI18n(settings);
+
+  if (YTCheckI18n.isDefaultBadgeText(els.badgeText.value.trim())) {
+    els.badgeText.value = YTCheckI18n.getDefaultBadgeText();
+    els.badgeText.placeholder = YTCheckI18n.t('badgeTextPlaceholder');
+    updatePreview();
+  }
+
+  await saveSettings();
+});
+
 els.btnSave.addEventListener('click', async () => {
   els.btnSave.disabled = true;
   await saveSettings();
   els.btnSave.disabled = false;
 
-  // Show header status
-  els.saveStatus.textContent = '✓ Configurações salvas';
+  els.saveStatus.textContent = YTCheckI18n.t('settingsSaved');
   els.saveStatus.classList.add('visible');
   setTimeout(() => els.saveStatus.classList.remove('visible'), 2500);
 
-  showToast('Configurações salvas com sucesso!', 'success');
+  showToast(YTCheckI18n.t('settingsSavedSuccess'), 'success');
 });
 
-// Reset button
-els.btnReset.addEventListener('click', () => {
-  if (!confirm('Restaurar todas as configurações para os valores padrão?')) return;
-  applySettingsToUI(DEFAULT_SETTINGS);
-  chrome.storage.sync.set({ settings: DEFAULT_SETTINGS }, () => {
+els.btnReset.addEventListener('click', async () => {
+  if (!confirm(YTCheckI18n.t('confirmReset'))) return;
+
+  const locale = els.locale.value || 'auto';
+  const resolvedLocale = YTCheckI18n.resolveLocale(locale);
+  const reset = {
+    ...DEFAULT_SETTINGS,
+    locale,
+    badgeText: YTCheckI18n.getDefaultBadgeText(resolvedLocale),
+  };
+
+  applySettingsToUI(reset);
+  applyI18n(reset);
+
+  chrome.storage.sync.set({ settings: reset }, () => {
+    previousLocale = locale;
     notifyContentScripts();
-    showToast('Configurações restauradas!', 'success');
+    showToast(YTCheckI18n.t('settingsRestored'), 'success');
   });
 });
 
-// Auto-save on toggle changes for immediate feedback
 [els.enabled, els.hideViewed, els.highlightUnviewed, els.showPageCounter].forEach((toggle) => {
   toggle.addEventListener('change', () => {
     saveSettings();
