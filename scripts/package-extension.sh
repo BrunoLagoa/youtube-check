@@ -26,6 +26,7 @@ mkdir -p "$BUILD_DIR"
 cp "$MANIFEST" "$BUILD_DIR/"
 cp -R "$ROOT_DIR/icons" "$BUILD_DIR/"
 cp -R "$ROOT_DIR/src" "$BUILD_DIR/"
+cp -R "$ROOT_DIR/_locales" "$BUILD_DIR/"
 
 mkdir -p "$DIST_DIR"
 rm -f "$ZIP_PATH"
