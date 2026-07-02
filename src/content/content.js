@@ -52,6 +52,9 @@
   /** @type {Set<string>} Shorts seen in the current player session (scroll feed) */
   let shortsSessionIds = new Set();
 
+  /** @type {number} Bumped each time a fresh Shorts monitoring session starts */
+  let _shortsSessionCounter = 0;
+
   // ─── CONTEXT GUARD ───────────────────────────────────────────────────────────
 
   /**
@@ -138,6 +141,8 @@
 
     if (isShorts) {
       startShortsMonitoring();
+      // The whole Shorts scroll session counts as one "page" — don't re-arm on every scroll.
+      resetCounterDismissalIfNewContext(`shorts:${_shortsSessionCounter}`);
 
       if (videoChanged) {
         _lastHandledVideoId = videoId;
@@ -145,6 +150,8 @@
       }
     } else {
       stopShortsMonitoring();
+      // A dismissal is momentary, tied to the current page only — re-arm on real navigation.
+      resetCounterDismissalIfNewContext(url);
 
       cleanupLikeObserver();
       removeWatchIndicator();
@@ -173,6 +180,7 @@
 
     if (!shortsMonitoringActive) {
       shortsMonitoringActive = true;
+      _shortsSessionCounter++;
       bindShortsClickCapture();
       startShortsUrlPolling();
       document.addEventListener('yt-navigate-finish', onShortsNavigateFinish);
@@ -892,11 +900,29 @@
   let _counterEl = null;
   let _counterTimer = null;
 
+  /** @type {boolean} User closed the counter on the current page (resets on navigation) */
+  let _counterDismissed = false;
+
+  /** @type {string|null} Identifies the current "page" context for the counter dismissal */
+  let _lastCounterContextKey = null;
+
+  /**
+   * Re-arm the dismissed counter when we've genuinely navigated to a new page/session.
+   * Guards against re-showing it on every internal Shorts scroll (same context key).
+   * @param {string} key
+   */
+  function resetCounterDismissalIfNewContext(key) {
+    if (key !== _lastCounterContextKey) {
+      _lastCounterContextKey = key;
+      _counterDismissed = false;
+    }
+  }
+
   /**
    * Create or update the floating counter showing viewed/total on the current page.
    */
   function updatePageCounter() {
-    if (!settings.enabled || settings.showPageCounter === false) {
+    if (!settings.enabled || settings.showPageCounter === false || _counterDismissed) {
       removePageCounter();
       return;
     }
@@ -944,6 +970,12 @@
       if (_counterEl) _counterEl.remove();
       _counterEl = document.createElement('div');
       _counterEl.id = 'ytcheck-page-counter';
+      _counterEl.addEventListener('click', (event) => {
+        if (event.target.closest('.ytcheck-counter-close')) {
+          _counterDismissed = true;
+          removePageCounter();
+        }
+      });
       document.body.appendChild(_counterEl);
     }
 
@@ -964,6 +996,7 @@
           </svg>
           <span class="ytcheck-ring-pct">${pct}%</span>
         </div>
+        <button type="button" class="ytcheck-counter-close" title="${YTCheckI18n.t('closeCounter')}" aria-label="${YTCheckI18n.t('closeCounter')}">×</button>
       </div>
     `;
     _counterEl.style.setProperty('--ytcheck-color', settings.badgeColor);

@@ -74,6 +74,7 @@ const YTCheckMessages = {
     localePtBR: 'Português (Brasil)',
     alreadyRatedVideo: 'You already rated this video',
     viewedOnPage: 'viewed on this page',
+    closeCounter: 'Hide for this page',
     badgeTextDefault: '✓ Viewed',
   },
 
@@ -148,6 +149,7 @@ const YTCheckMessages = {
     localePtBR: 'Português (Brasil)',
     alreadyRatedVideo: 'Você já avaliou este vídeo',
     viewedOnPage: 'vistos nesta página',
+    closeCounter: 'Ocultar nesta página',
     badgeTextDefault: '✓ Visualizado',
   },
 };

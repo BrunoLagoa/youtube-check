@@ -194,6 +194,7 @@ a#thumbnail:hover .ytcheck-badge {
 }
 
 .ytcheck-counter-inner {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -211,6 +212,40 @@ a#thumbnail:hover .ytcheck-badge {
 .ytcheck-counter-inner:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.08);
+}
+
+.ytcheck-counter-close {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  background: rgba(30, 30, 30, 0.95);
+  color: #ccc;
+  font-size: 12px;
+  line-height: 1;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.15s ease, transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.ytcheck-counter-inner:hover .ytcheck-counter-close {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.ytcheck-counter-close:hover {
+  background: #e53935;
+  border-color: #e53935;
+  color: #fff;
 }
 
 .ytcheck-counter-check {
