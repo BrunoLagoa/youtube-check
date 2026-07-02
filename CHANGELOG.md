@@ -2,12 +2,17 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.2.1] - 2026-07-02
+
+### Added
+
+- Botão de fechar (×) no contador flutuante da página — some apenas na página atual; volta ao navegar para outra página/vídeo ou ao reabrir os Shorts. Desativação permanente continua nas configurações
+
 ## [1.2.0] - 2026-07-02
 
 ### Added
 
 - Suporte a i18n (Inglês / Português) com seletor de idioma nas configurações
-- Botão de fechar (×) no contador flutuante da página — some apenas na página atual; volta ao navegar para outra página/vídeo ou ao reabrir os Shorts. Desativação permanente continua nas configurações
 - Script de empacotamento agora inclui `_locales` para publicação
 
 ### Fixed

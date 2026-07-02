@@ -3,7 +3,7 @@
   "default_locale": "en",
   "name": "__MSG_extName__",
   "short_name": "YT Check",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Marks YouTube videos you've rated (Like or Dislike) with a Viewed badge on thumbnails across the platform.",
   "icons": {
     "16": "icons/icon-16.png",
