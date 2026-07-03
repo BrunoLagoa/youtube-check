@@ -3,6 +3,8 @@
  * Handles lifecycle events and cross-context messaging.
  */
 
+const PRUNE_ALARM = 'ytcheck-prune-old-videos';
+
 // ─── INSTALLATION / UPGRADE ───────────────────────────────────────────────────
 
 chrome.runtime.onInstalled.addListener(async ({ reason }) => {
@@ -13,7 +15,47 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
   if (reason === 'update') {
     // Extension updated
   }
+
+  chrome.alarms.create(PRUNE_ALARM, { periodInMinutes: 1440 });
 });
+
+// Defensive re-arm on browser startup, in case onInstalled was missed.
+chrome.runtime.onStartup.addListener(() => {
+  chrome.alarms.create(PRUNE_ALARM, { periodInMinutes: 1440 });
+});
+
+// ─── HISTORY RETENTION (AUTO-CLEANUP) ─────────────────────────────────────────
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === PRUNE_ALARM) pruneOldVideos();
+});
+
+/**
+ * Remove tracked videos last updated before the user's configured retention
+ * window. No-op when historyRetentionDays is 0/unset (default — keep forever).
+ */
+async function pruneOldVideos() {
+  const { settings } = await chrome.storage.sync.get(['settings']);
+  const retentionDays = settings?.historyRetentionDays || 0;
+  if (retentionDays <= 0) return;
+
+  const { videos } = await chrome.storage.local.get(['videos']);
+  if (!videos) return;
+
+  const cutoff = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
+  let removed = 0;
+
+  for (const [id, data] of Object.entries(videos)) {
+    if ((data.updatedAt || 0) < cutoff) {
+      delete videos[id];
+      removed++;
+    }
+  }
+
+  if (removed > 0) {
+    await chrome.storage.local.set({ videos });
+  }
+}
 
 // ─── MESSAGE ROUTER ───────────────────────────────────────────────────────────
 

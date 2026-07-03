@@ -2,6 +2,14 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.3.0] - 2026-07-02
+
+### Added
+
+- Remoção individual de vídeos do histórico pelo popup (botão × por item)
+- Limpeza automática de histórico configurável ("Manter histórico por": sempre / 30 / 90 / 180 / 365 dias), com verificação diária via alarme
+- Permissão `unlimitedStorage` para remover o limite de ~10MB do armazenamento local
+
 ## [1.2.1] - 2026-07-02
 
 ### Added

@@ -135,11 +135,30 @@ async function renderHistory() {
             <span class="history-date">${YTCheckI18n.formatDate(video.updatedAt)}</span>
           </div>
         </div>
+        <button type="button" class="history-delete" data-video-id="${video.videoId}" title="${YTCheckI18n.t('removeFromHistory')}" aria-label="${YTCheckI18n.t('removeFromHistory')}">×</button>
       </a>
     `;
     els.historyList.appendChild(li);
   }
 }
+
+// ─── HISTORY ITEM REMOVAL ──────────────────────────────────────────────────────
+
+els.historyList.addEventListener('click', async (event) => {
+  const delBtn = event.target.closest('.history-delete');
+  if (!delBtn) return;
+
+  // Stop the click from following the wrapping <a> to the video page
+  event.preventDefault();
+  event.stopPropagation();
+
+  const videoId = delBtn.dataset.videoId;
+  if (!videoId) return;
+
+  await YTCheckStorage.deleteVideo(videoId);
+  await refreshStats();
+  showToast(YTCheckI18n.t('videoRemoved'), 'success');
+});
 
 // ─── ACTIONS ──────────────────────────────────────────────────────────────────
 

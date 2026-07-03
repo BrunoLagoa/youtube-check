@@ -416,6 +416,7 @@ body {
 }
 
 .history-item {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -425,6 +426,39 @@ body {
   transition: background var(--transition);
   text-decoration: none;
   color: inherit;
+}
+
+.history-delete {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%) scale(0.85);
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.history-item:hover .history-delete {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+}
+
+.history-delete:hover {
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+  color: #fff;
 }
 
 .history-item:last-child {

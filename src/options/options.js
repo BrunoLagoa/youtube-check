@@ -13,6 +13,7 @@ const els = {
   hideViewed:     document.getElementById('toggle-hide'),
   highlightUnviewed: document.getElementById('toggle-highlight'),
   showPageCounter: document.getElementById('toggle-counter'),
+  retention:      document.getElementById('select-retention'),
   badgeText:      document.getElementById('input-badge-text'),
   badgeColor:     document.getElementById('input-badge-color'),
   colorHex:       document.getElementById('color-hex'),
@@ -49,6 +50,13 @@ function applyI18n(settings) {
     opt.textContent = YTCheckI18n.t(opt.dataset.i18n);
   });
   els.locale.setAttribute('aria-label', YTCheckI18n.t('localeLabel'));
+
+  els.retention.querySelectorAll('option').forEach((opt) => {
+    opt.textContent = opt.value === '0'
+      ? YTCheckI18n.t('retentionForever')
+      : YTCheckI18n.t('retentionDays', opt.value);
+  });
+  els.retention.setAttribute('aria-label', YTCheckI18n.t('retentionLabel'));
 }
 
 // ─── LOAD SETTINGS ────────────────────────────────────────────────────────────
@@ -61,6 +69,7 @@ function applySettingsToUI(settings) {
   els.hideViewed.checked = settings.hideViewed;
   els.highlightUnviewed.checked = settings.highlightUnviewed;
   els.showPageCounter.checked = settings.showPageCounter !== false;
+  els.retention.value = String(settings.historyRetentionDays || 0);
   els.badgeText.value = settings.badgeText;
   els.badgeColor.value = settings.badgeColor;
   els.colorHex.textContent = settings.badgeColor;
@@ -102,6 +111,7 @@ function collectSettings() {
     hideViewed: els.hideViewed.checked,
     highlightUnviewed: els.highlightUnviewed.checked,
     showPageCounter: els.showPageCounter.checked,
+    historyRetentionDays: parseInt(els.retention.value, 10) || 0,
     badgeText,
     badgeColor: els.badgeColor.value,
     displayMode: els.modeOverlay.checked ? 'overlay' : 'badge',
@@ -218,7 +228,7 @@ els.btnReset.addEventListener('click', async () => {
   });
 });
 
-[els.enabled, els.hideViewed, els.highlightUnviewed, els.showPageCounter].forEach((toggle) => {
+[els.enabled, els.hideViewed, els.highlightUnviewed, els.showPageCounter, els.retention].forEach((toggle) => {
   toggle.addEventListener('change', () => {
     saveSettings();
   });

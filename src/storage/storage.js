@@ -50,6 +50,7 @@ const YTCheckStorage = (() => {
     highlightUnviewed: false,
     showPageCounter: true,
     locale: 'auto',             // 'auto' | 'en' | 'pt-BR'
+    historyRetentionDays: 0,    // 0 = keep forever (default); otherwise auto-prune older entries
   };
 
   /**
@@ -150,6 +151,53 @@ const YTCheckStorage = (() => {
     return safeStorage((resolve) => {
       chrome.storage.local.set({ videos: {} }, resolve);
     });
+  }
+
+  /**
+   * Delete a single video record by videoId (e.g. "remove from history").
+   * @param {string} videoId
+   * @returns {Promise<void>}
+   */
+  async function deleteVideo(videoId) {
+    if (!videoId) return;
+    return safeStorage((resolve) => {
+      chrome.storage.local.get(['videos'], (result) => {
+        const videos = result.videos || {};
+        delete videos[videoId];
+        chrome.storage.local.set({ videos }, resolve);
+      });
+    });
+  }
+
+  /**
+   * Remove video records last updated before the retention window.
+   * No-op when retentionDays is 0/falsy (retention disabled).
+   * @param {number} retentionDays
+   * @returns {Promise<number>} number of records removed
+   */
+  async function pruneOldVideos(retentionDays) {
+    if (!retentionDays || retentionDays <= 0) return 0;
+
+    return safeStorage((resolve) => {
+      chrome.storage.local.get(['videos'], (result) => {
+        const videos = result.videos || {};
+        const cutoff = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
+        let removed = 0;
+
+        for (const [id, data] of Object.entries(videos)) {
+          if ((data.updatedAt || 0) < cutoff) {
+            delete videos[id];
+            removed++;
+          }
+        }
+
+        if (removed === 0) {
+          resolve(0);
+          return;
+        }
+        chrome.storage.local.set({ videos }, () => resolve(removed));
+      });
+    }, 0);
   }
 
   /**
@@ -271,6 +319,8 @@ const YTCheckStorage = (() => {
     getAllVideos,
     getViewedIds,
     clearVideos,
+    deleteVideo,
+    pruneOldVideos,
     exportVideos,
     importVideos,
     getStats,

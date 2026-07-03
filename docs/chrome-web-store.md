@@ -116,6 +116,8 @@ Ajudar o usuário a identificar visualmente vídeos do YouTube que ele já avali
 | Permissão | Justificativa |
 |-----------|---------------|
 | `storage` | Armazenar localmente o histórico de vídeos avaliados e as preferências do usuário (cor do badge, texto, etc.). |
+| `unlimitedStorage` | Remove o limite padrão de ~10MB do `chrome.storage.local`, evitando falhas silenciosas ao salvar para usuários com histórico extenso. Nenhum dado sai do dispositivo do usuário. |
+| `alarms` | Agenda uma verificação diária que aplica a limpeza automática de histórico (configurável em "Manter histórico por"), quando o usuário optar por não manter os dados para sempre. |
 | `host_permissions: youtube.com` | Ler o estado dos botões de like/dislike nas páginas do YouTube e injetar badges visuais nas thumbnails. A extensão só funciona no YouTube. |
 
 ### Uso de dados (Data usage)
