@@ -20,6 +20,7 @@ const els = {
   btnImport:  document.getElementById('btn-import'),
   btnClear:   document.getElementById('btn-clear'),
   btnSettings: document.getElementById('btn-settings'),
+  btnOpenYoutube: document.getElementById('btn-open-youtube'),
   importFile: document.getElementById('import-file'),
   toast:      document.getElementById('toast'),
   footerVersion: document.getElementById('footer-version'),
@@ -271,6 +272,11 @@ els.btnClear.addEventListener('click', () => {
 
 els.btnSettings.addEventListener('click', () => {
   chrome.runtime.openOptionsPage();
+  window.close();
+});
+
+els.btnOpenYoutube.addEventListener('click', () => {
+  chrome.tabs.create({ url: 'https://www.youtube.com' });
   window.close();
 });
 

@@ -12,6 +12,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/).
 - Contador flutuante agora pode ser arrastado para qualquer posição da tela (posição salva e sincronizada); clique duplo restaura o canto padrão
 - Versão da extensão exibida no rodapé do popup e das configurações
 - Ícones de LinkedIn e GitHub no rodapé
+- Onboarding: tela de boas-vindas abre automaticamente na instalação, explicando como usar a extensão em 3 passos
+- Estado vazio do popup (sem histórico) agora mostra os 3 passos e um botão "Abrir o YouTube"
 
 ## [1.2.1] - 2026-07-02
 

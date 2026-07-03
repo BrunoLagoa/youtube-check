@@ -395,6 +395,44 @@ body {
   max-width: 220px;
 }
 
+.onboarding-steps {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin: 6px 0 2px;
+  text-align: left;
+}
+
+.onboarding-steps li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+.onboarding-step-num {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-accent-dim);
+  color: var(--color-accent);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.history-empty-cta {
+  width: 100%;
+  margin-top: 4px;
+}
+
 /* ─── HISTORY LIST ────────────────────────────────────────────────────────────── */
 .history-list {
   list-style: none;

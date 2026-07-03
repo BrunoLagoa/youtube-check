@@ -9,7 +9,7 @@ const PRUNE_ALARM = 'ytcheck-prune-old-videos';
 
 chrome.runtime.onInstalled.addListener(async ({ reason }) => {
   if (reason === 'install') {
-    // First install — user can open options from the popup
+    chrome.tabs.create({ url: chrome.runtime.getURL('src/onboarding/welcome.html') });
   }
 
   if (reason === 'update') {

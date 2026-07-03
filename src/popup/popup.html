@@ -113,6 +113,19 @@
       </div>
       <p class="history-empty-title" data-i18n="noVideosYet">No videos tracked yet</p>
       <p class="history-empty-desc" data-i18n="noVideosDesc">Open a video on YouTube and give it a Like or Dislike to start tracking.</p>
+
+      <ol class="onboarding-steps">
+        <li><span class="onboarding-step-num">1</span><span data-i18n="onboardingStep1">Open a video and give it a Like or Dislike</span></li>
+        <li><span class="onboarding-step-num">2</span><span data-i18n="onboardingStep2">The "✓ Viewed" badge appears on it automatically</span></li>
+        <li><span class="onboarding-step-num">3</span><span data-i18n="onboardingStep3">Come back here to see stats and history</span></li>
+      </ol>
+
+      <button id="btn-open-youtube" class="action-btn action-btn--primary history-empty-cta">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+        </svg>
+        <span data-i18n="btnOpenYoutube">Open YouTube</span>
+      </button>
     </div>
 
     <!-- Video list -->
