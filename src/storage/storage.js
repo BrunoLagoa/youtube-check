@@ -51,6 +51,8 @@ const YTCheckStorage = (() => {
     showPageCounter: true,
     locale: 'auto',             // 'auto' | 'en' | 'pt-BR'
     historyRetentionDays: 0,    // 0 = keep forever (default); otherwise auto-prune older entries
+    counterPositionX: null,     // % of viewport width; null = default bottom-right corner
+    counterPositionY: null,     // % of viewport height; null = default bottom-right corner
   };
 
   /**

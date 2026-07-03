@@ -918,6 +918,109 @@
     }
   }
 
+  /** @type {{offsetX:number, offsetY:number, startX:number, startY:number, moved:boolean}|null} */
+  let _counterDragState = null;
+
+  /**
+   * Apply the user's saved custom position, or fall back to the default
+   * bottom-right corner (CSS-driven) when none is set. Skipped mid-drag so
+   * a concurrent counter refresh doesn't fight the live drag position.
+   */
+  function applyCounterPosition() {
+    if (!_counterEl || _counterDragState) return;
+
+    const { counterPositionX: x, counterPositionY: y } = settings;
+    if (x == null || y == null) {
+      _counterEl.style.left = '';
+      _counterEl.style.top = '';
+      _counterEl.style.right = '';
+      _counterEl.style.bottom = '';
+      return;
+    }
+
+    _counterEl.style.right = 'auto';
+    _counterEl.style.bottom = 'auto';
+    _counterEl.style.left = `${Math.round((x / 100) * window.innerWidth)}px`;
+    _counterEl.style.top = `${Math.round((y / 100) * window.innerHeight)}px`;
+  }
+
+  /**
+   * Start dragging the counter widget (left mouse button, ignored on the close button).
+   * @param {MouseEvent} event
+   */
+  function onCounterMouseDown(event) {
+    if (event.button !== 0 || event.target.closest('.ytcheck-counter-close')) return;
+
+    const rect = _counterEl.getBoundingClientRect();
+    _counterDragState = {
+      offsetX: event.clientX - rect.left,
+      offsetY: event.clientY - rect.top,
+      startX: event.clientX,
+      startY: event.clientY,
+      moved: false,
+    };
+
+    document.addEventListener('mousemove', onCounterMouseMove);
+    document.addEventListener('mouseup', onCounterMouseUp);
+    event.preventDefault();
+  }
+
+  function onCounterMouseMove(event) {
+    if (!_counterDragState || !_counterEl) return;
+
+    const dx = event.clientX - _counterDragState.startX;
+    const dy = event.clientY - _counterDragState.startY;
+    if (!_counterDragState.moved && Math.hypot(dx, dy) < 4) return;
+
+    if (!_counterDragState.moved) {
+      _counterDragState.moved = true;
+      _counterEl.classList.add('ytcheck-counter-dragging');
+    }
+
+    const rect = _counterEl.getBoundingClientRect();
+    const margin = 4;
+    const left = Math.max(margin, Math.min(window.innerWidth - rect.width - margin, event.clientX - _counterDragState.offsetX));
+    const top = Math.max(margin, Math.min(window.innerHeight - rect.height - margin, event.clientY - _counterDragState.offsetY));
+
+    _counterEl.style.right = 'auto';
+    _counterEl.style.bottom = 'auto';
+    _counterEl.style.left = `${left}px`;
+    _counterEl.style.top = `${top}px`;
+  }
+
+  async function onCounterMouseUp() {
+    document.removeEventListener('mousemove', onCounterMouseMove);
+    document.removeEventListener('mouseup', onCounterMouseUp);
+
+    const dragState = _counterDragState;
+    _counterDragState = null;
+    if (!dragState || !_counterEl) return;
+
+    _counterEl.classList.remove('ytcheck-counter-dragging');
+    if (!dragState.moved) return;
+
+    const rect = _counterEl.getBoundingClientRect();
+    const posX = (rect.left / window.innerWidth) * 100;
+    const posY = (rect.top / window.innerHeight) * 100;
+
+    settings.counterPositionX = posX;
+    settings.counterPositionY = posY;
+    await YTCheckStorage.saveSettings({ counterPositionX: posX, counterPositionY: posY });
+  }
+
+  /**
+   * Double-click resets the counter back to its default bottom-right corner.
+   * @param {MouseEvent} event
+   */
+  async function onCounterDoubleClick(event) {
+    if (event.target.closest('.ytcheck-counter-close')) return;
+
+    settings.counterPositionX = null;
+    settings.counterPositionY = null;
+    applyCounterPosition();
+    await YTCheckStorage.saveSettings({ counterPositionX: null, counterPositionY: null });
+  }
+
   /**
    * Create or update the floating counter showing viewed/total on the current page.
    */
@@ -976,6 +1079,8 @@
           removePageCounter();
         }
       });
+      _counterEl.addEventListener('mousedown', onCounterMouseDown);
+      _counterEl.addEventListener('dblclick', onCounterDoubleClick);
       document.body.appendChild(_counterEl);
     }
 
@@ -1000,6 +1105,8 @@
       </div>
     `;
     _counterEl.style.setProperty('--ytcheck-color', settings.badgeColor);
+    _counterEl.title = YTCheckI18n.t('counterDragHint');
+    applyCounterPosition();
   }
 
   function removePageCounter() {
@@ -1007,6 +1114,9 @@
       _counterEl.remove();
       _counterEl = null;
     }
+    // Defensive: an in-progress drag has nothing left to reposition.
+    // The pending document mousemove/mouseup listeners self-clean on the next mouseup.
+    _counterDragState = null;
   }
 
   /**

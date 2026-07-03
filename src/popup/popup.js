@@ -22,6 +22,7 @@ const els = {
   btnSettings: document.getElementById('btn-settings'),
   importFile: document.getElementById('import-file'),
   toast:      document.getElementById('toast'),
+  footerVersion: document.getElementById('footer-version'),
 };
 
 // ─── TOAST ────────────────────────────────────────────────────────────────────
@@ -279,5 +280,6 @@ els.btnSettings.addEventListener('click', () => {
   const settings = await YTCheckStorage.getSettings();
   YTCheckI18n.init(settings);
   document.title = YTCheckI18n.t('extName');
+  els.footerVersion.textContent = `v${chrome.runtime.getManifest().version}`;
   refreshStats();
 })();

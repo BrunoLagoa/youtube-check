@@ -204,7 +204,7 @@ a#thumbnail:hover .ytcheck-badge {
   border-radius: 20px;
   backdrop-filter: blur(16px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.04);
-  cursor: default;
+  cursor: grab;
   user-select: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -212,6 +212,16 @@ a#thumbnail:hover .ytcheck-badge {
 .ytcheck-counter-inner:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.08);
+}
+
+.ytcheck-counter-inner:active {
+  cursor: grabbing;
+}
+
+/* While actively dragging: no hover-lift/transition, so the widget tracks the pointer 1:1 */
+#ytcheck-page-counter.ytcheck-counter-dragging .ytcheck-counter-inner {
+  transition: none;
+  transform: none;
 }
 
 .ytcheck-counter-close {

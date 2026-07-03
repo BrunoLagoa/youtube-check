@@ -565,13 +565,20 @@ body {
 /* ─── FOOTER ─────────────────────────────────────────────────────────────────── */
 .popup-footer {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 3px;
   padding: 10px 14px 12px;
   font-size: 10.5px;
   color: var(--color-text-muted);
   border-top: 1px solid var(--color-border);
+}
+
+.footer-credit {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .popup-footer .footer-link {
@@ -584,6 +591,11 @@ body {
 .popup-footer .footer-link:hover {
   opacity: 0.75;
   text-decoration: underline;
+}
+
+.footer-version {
+  font-size: 9px;
+  opacity: 0.6;
 }
 
 /* ─── TOAST ──────────────────────────────────────────────────────────────────── */

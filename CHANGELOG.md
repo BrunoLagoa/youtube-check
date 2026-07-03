@@ -9,6 +9,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/).
 - Remoção individual de vídeos do histórico pelo popup (botão × por item)
 - Limpeza automática de histórico configurável ("Manter histórico por": sempre / 30 / 90 / 180 / 365 dias), com verificação diária via alarme
 - Permissão `unlimitedStorage` para remover o limite de ~10MB do armazenamento local
+- Contador flutuante agora pode ser arrastado para qualquer posição da tela (posição salva e sincronizada); clique duplo restaura o canto padrão
+- Versão da extensão exibida no rodapé do popup e das configurações
+
+### Changed
+
+- Link "Desenvolvido por Bruno Castro" no rodapé agora aponta para o GitHub (github.com/brunolagoa)
 
 ## [1.2.1] - 2026-07-02
 

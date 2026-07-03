@@ -24,9 +24,14 @@ const els = {
   btnReset:       document.getElementById('btn-reset'),
   toast:          document.getElementById('toast'),
   saveStatus:     document.getElementById('save-status'),
+  footerVersion:  document.getElementById('footer-version'),
 };
 
 let previousLocale = 'auto';
+
+// Baseline for fields the Options UI doesn't expose (e.g. the drag-to-reposition
+// counter coordinates, set only from the YouTube page) so saving here never wipes them.
+let _loadedSettings = DEFAULT_SETTINGS;
 
 // ─── TOAST ────────────────────────────────────────────────────────────────────
 
@@ -85,6 +90,7 @@ function applySettingsToUI(settings) {
 
 async function loadSettings() {
   const settings = await YTCheckStorage.getSettings();
+  _loadedSettings = settings;
   applyI18n(settings);
   applySettingsToUI(settings);
 }
@@ -106,6 +112,7 @@ function collectSettings() {
   }
 
   return {
+    ..._loadedSettings, // preserves fields not exposed in this UI (e.g. counterPositionX/Y)
     locale,
     enabled: els.enabled.checked,
     hideViewed: els.hideViewed.checked,
@@ -152,6 +159,7 @@ function updatePreview(settings) {
 async function saveSettings() {
   const settings = collectSettings();
   previousLocale = settings.locale;
+  _loadedSettings = settings;
 
   return new Promise((resolve) => {
     chrome.storage.sync.set({ settings }, () => {
@@ -220,6 +228,7 @@ els.btnReset.addEventListener('click', async () => {
 
   applySettingsToUI(reset);
   applyI18n(reset);
+  _loadedSettings = reset;
 
   chrome.storage.sync.set({ settings: reset }, () => {
     previousLocale = locale;
@@ -235,4 +244,5 @@ els.btnReset.addEventListener('click', async () => {
 });
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
+els.footerVersion.textContent = `v${chrome.runtime.getManifest().version}`;
 loadSettings();
