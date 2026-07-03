@@ -501,7 +501,7 @@
   // Marks a video as "viewed" after watching most of it, even without a like/dislike.
   // Disabled by default — gated entirely behind settings.trackWatchProgress.
 
-  const WATCH_PROGRESS_THRESHOLD = 0.9;
+  const DEFAULT_WATCH_PROGRESS_THRESHOLD = 0.9;
 
   /** @type {HTMLVideoElement|null} <video> element currently being watched for progress */
   let _progressVideoEl = null;
@@ -556,7 +556,8 @@
     const { duration, currentTime } = el;
     // Skip live streams / not-yet-ready players (duration is 0, NaN or Infinity)
     if (!duration || !isFinite(duration) || duration <= 0) return;
-    if (currentTime / duration < WATCH_PROGRESS_THRESHOLD) return;
+    const threshold = settings.watchProgressThreshold || DEFAULT_WATCH_PROGRESS_THRESHOLD;
+    if (currentTime / duration < threshold) return;
 
     el.removeEventListener('timeupdate', onWatchProgressTick);
     if (_progressVideoEl === el) _progressVideoEl = null;

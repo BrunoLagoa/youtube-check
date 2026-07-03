@@ -104,12 +104,26 @@
           <div class="setting-row">
             <div class="setting-info">
               <label class="setting-label" for="toggle-watch-progress" data-i18n="toggleWatchProgress">Mark as viewed by watch time</label>
-              <p class="setting-desc" data-i18n="toggleWatchProgressDesc">Also marks a video as viewed once you watch about 90% of it, even without a Like or Dislike. Off by default.</p>
+              <p class="setting-desc" data-i18n="toggleWatchProgressDesc">Also marks a video as viewed once you watch most of it, even without a Like or Dislike. Off by default.</p>
             </div>
             <label class="toggle" for="toggle-watch-progress">
               <input type="checkbox" id="toggle-watch-progress" role="switch" />
               <span class="toggle-thumb"></span>
             </label>
+          </div>
+
+          <div class="setting-row" id="row-watch-threshold" hidden>
+            <div class="setting-info">
+              <label class="setting-label" for="select-watch-threshold" data-i18n="watchThresholdLabel">Watch time to mark as viewed</label>
+              <p class="setting-desc" data-i18n="watchThresholdDesc">Percentage of the video you need to watch before it is auto-marked as viewed.</p>
+            </div>
+            <select id="select-watch-threshold" class="select-input" aria-label="Watch time to mark as viewed">
+              <option value="0.75">75%</option>
+              <option value="0.8">80%</option>
+              <option value="0.85">85%</option>
+              <option value="0.9">90%</option>
+              <option value="0.95">95%</option>
+            </select>
           </div>
 
         </div>

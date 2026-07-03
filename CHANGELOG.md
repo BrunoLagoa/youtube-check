@@ -2,6 +2,16 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.4.0] - 2026-07-03
+
+### Added
+
+- Porcentagem de tempo assistido configurável para a marcação automática por tempo (75% / 80% / 85% / 90% padrão / 95%). O seletor aparece apenas quando a opção "Marcar como visto pelo tempo assistido" está ligada
+
+### Changed
+
+- Descrição da opção "Marcar como visto pelo tempo assistido" deixou de fixar "90%" para refletir a porcentagem configurável
+
 ## [1.3.0] - 2026-07-02
 
 ### Added

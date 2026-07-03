@@ -14,6 +14,8 @@ const els = {
   highlightUnviewed: document.getElementById('toggle-highlight'),
   showPageCounter: document.getElementById('toggle-counter'),
   trackWatchProgress: document.getElementById('toggle-watch-progress'),
+  watchThreshold: document.getElementById('select-watch-threshold'),
+  watchThresholdRow: document.getElementById('row-watch-threshold'),
   retention:      document.getElementById('select-retention'),
   badgeText:      document.getElementById('input-badge-text'),
   badgeColor:     document.getElementById('input-badge-color'),
@@ -65,6 +67,11 @@ function applyI18n(settings) {
   els.retention.setAttribute('aria-label', YTCheckI18n.t('retentionLabel'));
 }
 
+// Show the watch-time threshold selector only while the feature is enabled.
+function updateWatchThresholdVisibility() {
+  els.watchThresholdRow.hidden = !els.trackWatchProgress.checked;
+}
+
 // ─── LOAD SETTINGS ────────────────────────────────────────────────────────────
 
 function applySettingsToUI(settings) {
@@ -76,6 +83,8 @@ function applySettingsToUI(settings) {
   els.highlightUnviewed.checked = settings.highlightUnviewed;
   els.showPageCounter.checked = settings.showPageCounter !== false;
   els.trackWatchProgress.checked = !!settings.trackWatchProgress;
+  els.watchThreshold.value = String(settings.watchProgressThreshold ?? 0.9);
+  updateWatchThresholdVisibility();
   els.retention.value = String(settings.historyRetentionDays || 0);
   els.badgeText.value = settings.badgeText;
   els.badgeColor.value = settings.badgeColor;
@@ -121,6 +130,7 @@ function collectSettings() {
     highlightUnviewed: els.highlightUnviewed.checked,
     showPageCounter: els.showPageCounter.checked,
     trackWatchProgress: els.trackWatchProgress.checked,
+    watchProgressThreshold: parseFloat(els.watchThreshold.value) || 0.9,
     historyRetentionDays: parseInt(els.retention.value, 10) || 0,
     badgeText,
     badgeColor: els.badgeColor.value,
@@ -240,11 +250,13 @@ els.btnReset.addEventListener('click', async () => {
   });
 });
 
-[els.enabled, els.hideViewed, els.highlightUnviewed, els.showPageCounter, els.trackWatchProgress, els.retention].forEach((toggle) => {
+[els.enabled, els.hideViewed, els.highlightUnviewed, els.showPageCounter, els.trackWatchProgress, els.watchThreshold, els.retention].forEach((toggle) => {
   toggle.addEventListener('change', () => {
     saveSettings();
   });
 });
+
+els.trackWatchProgress.addEventListener('change', updateWatchThresholdVisibility);
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 els.footerVersion.textContent = `v${chrome.runtime.getManifest().version}`;

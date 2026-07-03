@@ -53,8 +53,12 @@ const YTCheckStorage = (() => {
     historyRetentionDays: 0,    // 0 = keep forever (default); otherwise auto-prune older entries
     counterPositionX: null,     // % of viewport width; null = default bottom-right corner
     counterPositionY: null,     // % of viewport height; null = default bottom-right corner
-    trackWatchProgress: false,  // opt-in: mark as viewed after watching ~90%, even without a like/dislike
+    trackWatchProgress: false,  // opt-in: mark as viewed after watching most of a video, even without a like/dislike
+    watchProgressThreshold: 0.9, // fraction (0–1) of the video that must be watched to auto-mark as viewed
   };
+
+  // Allowed watch-progress thresholds (fractions). Stored values are clamped to this set.
+  const WATCH_PROGRESS_THRESHOLDS = [0.75, 0.8, 0.85, 0.9, 0.95];
 
   /**
    * Resolve badgeText and locale-aware defaults when loading settings.
@@ -71,6 +75,11 @@ const YTCheckStorage = (() => {
       merged.badgeText = typeof YTCheckI18n !== 'undefined'
         ? YTCheckI18n.getDefaultBadgeText(locale)
         : (locale === 'pt-BR' ? '✓ Visualizado' : '✓ Viewed');
+    }
+
+    // Guard against out-of-range / legacy values from storage
+    if (!WATCH_PROGRESS_THRESHOLDS.includes(merged.watchProgressThreshold)) {
+      merged.watchProgressThreshold = DEFAULT_SETTINGS.watchProgressThreshold;
     }
 
     return merged;
