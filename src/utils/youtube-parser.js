@@ -172,6 +172,20 @@ const YTParser = (() => {
   }
 
   /**
+   * Returns the actual <video> element currently playing — the regular watch
+   * page player, or the active Short's player when in the Shorts feed.
+   * Used for watch-progress-based "viewed" detection.
+   * @returns {HTMLVideoElement|null}
+   */
+  function getActiveVideoElement() {
+    if (isShortsPlayer()) {
+      const reel = getActiveShortsReel();
+      return reel ? reel.querySelector('video') : null;
+    }
+    return document.querySelector('#movie_player video, video.html5-main-video');
+  }
+
+  /**
    * Given a YouTube video card element, extract its video data.
    * @param {Element} el
    * @returns {{ videoId: string, title: string, channel: string, thumbnail: string, url: string }|null}
@@ -646,6 +660,7 @@ const YTParser = (() => {
     getActiveShortsReel,
     getShortsRoot,
     getCurrentShortsVideoId,
+    getActiveVideoElement,
     getShortsRatingClickType,
     VIDEO_ELEMENTS_SELECTOR,
     VIDEO_ELEMENT_TAGS,

@@ -14,6 +14,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/).
 - Ícones de LinkedIn e GitHub no rodapé
 - Onboarding: tela de boas-vindas abre automaticamente na instalação, explicando como usar a extensão em 3 passos
 - Estado vazio do popup (sem histórico) agora mostra os 3 passos e um botão "Abrir o YouTube"
+- Opção (desligada por padrão) para marcar um vídeo como visto ao assistir ~90% dele, mesmo sem dar like/dislike — "Marcar como visto pelo tempo assistido" nas configurações
+
+### Changed
+
+- Propósito único e política de privacidade atualizados na documentação da loja para refletir a nova opção de marcação por tempo assistido
 
 ## [1.2.1] - 2026-07-02
 

@@ -53,6 +53,7 @@ const YTCheckStorage = (() => {
     historyRetentionDays: 0,    // 0 = keep forever (default); otherwise auto-prune older entries
     counterPositionX: null,     // % of viewport width; null = default bottom-right corner
     counterPositionY: null,     // % of viewport height; null = default bottom-right corner
+    trackWatchProgress: false,  // opt-in: mark as viewed after watching ~90%, even without a like/dislike
   };
 
   /**
@@ -106,13 +107,17 @@ const YTCheckStorage = (() => {
         const existing = videos[videoId] || {};
         const liked = videoData.liked !== undefined ? videoData.liked : !!existing.liked;
         const disliked = videoData.disliked !== undefined ? videoData.disliked : !!existing.disliked;
+        const watchedByProgress = videoData.watchedByProgress !== undefined
+          ? videoData.watchedByProgress
+          : !!existing.watchedByProgress;
 
         videos[videoId] = {
           ...existing,
           ...videoData,
           liked,
           disliked,
-          viewed: !!(liked || disliked),
+          watchedByProgress,
+          viewed: !!(liked || disliked || watchedByProgress),
           updatedAt: Date.now(),
         };
         chrome.storage.local.set({ videos }, resolve);
@@ -237,7 +242,7 @@ const YTCheckStorage = (() => {
               videos[id] = {
                 ...videos[id],
                 ...data,
-                viewed: !!(data.liked || data.disliked),
+                viewed: !!(data.liked || data.disliked || data.watchedByProgress),
               };
               imported++;
             } else {

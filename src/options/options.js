@@ -13,6 +13,7 @@ const els = {
   hideViewed:     document.getElementById('toggle-hide'),
   highlightUnviewed: document.getElementById('toggle-highlight'),
   showPageCounter: document.getElementById('toggle-counter'),
+  trackWatchProgress: document.getElementById('toggle-watch-progress'),
   retention:      document.getElementById('select-retention'),
   badgeText:      document.getElementById('input-badge-text'),
   badgeColor:     document.getElementById('input-badge-color'),
@@ -74,6 +75,7 @@ function applySettingsToUI(settings) {
   els.hideViewed.checked = settings.hideViewed;
   els.highlightUnviewed.checked = settings.highlightUnviewed;
   els.showPageCounter.checked = settings.showPageCounter !== false;
+  els.trackWatchProgress.checked = !!settings.trackWatchProgress;
   els.retention.value = String(settings.historyRetentionDays || 0);
   els.badgeText.value = settings.badgeText;
   els.badgeColor.value = settings.badgeColor;
@@ -118,6 +120,7 @@ function collectSettings() {
     hideViewed: els.hideViewed.checked,
     highlightUnviewed: els.highlightUnviewed.checked,
     showPageCounter: els.showPageCounter.checked,
+    trackWatchProgress: els.trackWatchProgress.checked,
     historyRetentionDays: parseInt(els.retention.value, 10) || 0,
     badgeText,
     badgeColor: els.badgeColor.value,
@@ -237,7 +240,7 @@ els.btnReset.addEventListener('click', async () => {
   });
 });
 
-[els.enabled, els.hideViewed, els.highlightUnviewed, els.showPageCounter, els.retention].forEach((toggle) => {
+[els.enabled, els.hideViewed, els.highlightUnviewed, els.showPageCounter, els.trackWatchProgress, els.retention].forEach((toggle) => {
   toggle.addEventListener('change', () => {
     saveSettings();
   });

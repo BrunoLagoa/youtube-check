@@ -155,11 +155,13 @@
 
       cleanupLikeObserver();
       removeWatchIndicator();
+      cleanupWatchProgressTracking();
       _lastHandledVideoId = videoId;
 
       if (YTParser.isWatchPage()) {
         scheduleLikeDetection();
         scheduleWatchIndicatorCheck();
+        scheduleWatchProgressTracking();
       }
     }
 
@@ -214,6 +216,7 @@
       likeObserver.disconnect();
       likeObserver = null;
     }
+    cleanupWatchProgressTracking();
   }
 
   /**
@@ -230,6 +233,7 @@
     ensureShortsLikeObserver();
     syncShortsLikeState();
     scheduleWatchIndicatorCheck();
+    scheduleWatchProgressTracking();
 
     if (settings.enabled) {
       processAllVisibleVideos();
@@ -419,6 +423,28 @@
   }
 
   /**
+   * Extract title/channel/thumbnail for the video currently playing (watch
+   * page or Shorts). Shared by like/dislike and watch-progress tracking.
+   * @param {string} videoId
+   * @returns {{title: string, channel: string, thumbnail: string}}
+   */
+  function extractCurrentVideoMeta(videoId) {
+    const title = YTParser.isShortsPlayer()
+      ? (YTParser.extractFromShortsPlayer()?.title || document.title.replace(' - YouTube', '').trim())
+      : document.title.replace(' - YouTube', '').trim();
+
+    const thumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+    const channelEl = YTParser.isShortsPlayer()
+      ? (document.querySelector('ytd-reel-video-renderer[is-active] ytd-channel-name') ||
+         document.querySelector('ytd-reel-video-renderer[is-active] #channel-name'))
+      : (document.querySelector('ytd-video-owner-renderer #channel-name yt-formatted-string') ||
+         document.querySelector('#owner #channel-name'));
+    const channel = channelEl ? channelEl.textContent.trim() : '';
+
+    return { title, channel, thumbnail };
+  }
+
+  /**
    * Persist the like/dislike state for the current video.
    * @param {{ liked: boolean, disliked: boolean }} state
    */
@@ -429,9 +455,6 @@
 
     if (!videoId) return;
 
-    const title = YTParser.isShortsPlayer()
-      ? (YTParser.extractFromShortsPlayer()?.title || document.title.replace(' - YouTube', '').trim())
-      : document.title.replace(' - YouTube', '').trim();
     const existing = await YTCheckStorage.getVideo(videoId);
 
     // Avoid unnecessary writes if nothing changed
@@ -445,13 +468,7 @@
       return;
     }
 
-    const thumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
-    const channelEl = YTParser.isShortsPlayer()
-      ? (document.querySelector('ytd-reel-video-renderer[is-active] ytd-channel-name') ||
-         document.querySelector('ytd-reel-video-renderer[is-active] #channel-name'))
-      : (document.querySelector('ytd-video-owner-renderer #channel-name yt-formatted-string') ||
-         document.querySelector('#owner #channel-name'));
-    const channel = channelEl ? channelEl.textContent.trim() : '';
+    const { title, channel, thumbnail } = extractCurrentVideoMeta(videoId);
 
     await YTCheckStorage.saveVideo({
       videoId,
@@ -463,8 +480,9 @@
       disliked: state.disliked,
     });
 
-    // Update local cache
-    if (state.liked || state.disliked) {
+    // Update local cache — keep it if watch-progress already marked it viewed,
+    // so removing a like/dislike doesn't un-mark a video watched to completion.
+    if (state.liked || state.disliked || existing?.watchedByProgress) {
       viewedIds.add(videoId);
     } else {
       viewedIds.delete(videoId);
@@ -477,6 +495,107 @@
     // Update watch page indicator with fresh state
     updateWatchIndicator(state.liked, state.disliked);
     if (settings.enabled) scheduleCounterUpdate();
+  }
+
+  // ─── WATCH PROGRESS TRACKING (OPT-IN) ────────────────────────────────────────
+  // Marks a video as "viewed" after watching most of it, even without a like/dislike.
+  // Disabled by default — gated entirely behind settings.trackWatchProgress.
+
+  const WATCH_PROGRESS_THRESHOLD = 0.9;
+
+  /** @type {HTMLVideoElement|null} <video> element currently being watched for progress */
+  let _progressVideoEl = null;
+  /** @type {string|null} videoId associated with _progressVideoEl */
+  let _progressVideoId = null;
+  /** @type {number|null} Retry timer while the <video> element isn't mounted yet */
+  let _progressRetryTimer = null;
+
+  /**
+   * (Re)start watch-progress tracking for the current video/Short, if the
+   * feature is enabled in settings. Safe to call on every navigation/settings
+   * change — it tears down any previous listener first.
+   */
+  function scheduleWatchProgressTracking() {
+    cleanupWatchProgressTracking();
+    if (!settings.trackWatchProgress) return;
+
+    const videoId = YTParser.isShortsPlayer()
+      ? YTParser.getCurrentShortsVideoId()
+      : YTParser.getCurrentVideoId();
+    if (!videoId) return;
+
+    let attempts = 0;
+    const maxAttempts = 15;
+
+    function attempt() {
+      const el = YTParser.getActiveVideoElement();
+      if (el) {
+        _progressVideoEl = el;
+        _progressVideoId = videoId;
+        el.addEventListener('timeupdate', onWatchProgressTick);
+        return;
+      }
+      if (attempts++ < maxAttempts) {
+        _progressRetryTimer = setTimeout(attempt, 500);
+      }
+    }
+
+    attempt();
+  }
+
+  /**
+   * Fires on the video's native `timeupdate` event (~4x/sec). Once the
+   * configured threshold is crossed, persists the video as viewed and stops
+   * listening — no further writes needed for this playback.
+   */
+  async function onWatchProgressTick() {
+    const el = _progressVideoEl;
+    const videoId = _progressVideoId;
+    if (!el || !videoId) return;
+
+    const { duration, currentTime } = el;
+    // Skip live streams / not-yet-ready players (duration is 0, NaN or Infinity)
+    if (!duration || !isFinite(duration) || duration <= 0) return;
+    if (currentTime / duration < WATCH_PROGRESS_THRESHOLD) return;
+
+    el.removeEventListener('timeupdate', onWatchProgressTick);
+    if (_progressVideoEl === el) _progressVideoEl = null;
+
+    const existing = await YTCheckStorage.getVideo(videoId);
+    if (existing?.watchedByProgress) return; // already recorded, nothing to do
+
+    const { title, channel, thumbnail } = extractCurrentVideoMeta(videoId);
+
+    await YTCheckStorage.saveVideo({
+      videoId,
+      title,
+      channel,
+      thumbnail,
+      url: window.location.href,
+      watchedByProgress: true,
+    });
+
+    viewedIds.add(videoId);
+    if (YTParser.isShortsPlayer()) shortsSessionIds.add(videoId);
+    if (settings.enabled) {
+      processAllVisibleVideos();
+      scheduleCounterUpdate();
+    }
+  }
+
+  /**
+   * Stop watch-progress tracking (navigation away, feature toggled off, etc.).
+   */
+  function cleanupWatchProgressTracking() {
+    if (_progressRetryTimer) {
+      clearTimeout(_progressRetryTimer);
+      _progressRetryTimer = null;
+    }
+    if (_progressVideoEl) {
+      _progressVideoEl.removeEventListener('timeupdate', onWatchProgressTick);
+      _progressVideoEl = null;
+    }
+    _progressVideoId = null;
   }
 
   // ─── WATCH PAGE INDICATOR ─────────────────────────────────────────────────────
@@ -804,7 +923,10 @@
     settings = await YTCheckStorage.getSettings();
     applyI18nFromSettings();
 
-    if (!settings.enabled) return;
+    if (!settings.enabled) {
+      cleanupWatchProgressTracking();
+      return;
+    }
 
     const elements = document.querySelectorAll('[data-ytcheck-id]');
     for (const el of elements) {
@@ -827,6 +949,9 @@
         updateWatchIndicator(record.liked, record.disliked);
       }
     }
+
+    // Pick up settings.trackWatchProgress being toggled on/off without a page reload
+    scheduleWatchProgressTracking();
   }
 
   // ─── MESSAGE HANDLER ─────────────────────────────────────────────────────────

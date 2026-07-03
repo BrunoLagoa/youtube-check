@@ -84,6 +84,7 @@ Recursos
 ✓ Popup com estatísticas e histórico recente
 ✓ Exportar e importar dados (JSON)
 ✓ Configurações sincronizadas entre dispositivos (Chrome Sync)
+✓ Opcional: marcar como visto pelo tempo assistido (~90%), mesmo sem avaliar (desligado por padrão)
 
 Privacidade
 • Nenhum dado é enviado para servidores externos
@@ -108,7 +109,7 @@ Português (Brasil)
 ### Propósito único (Single purpose)
 
 ```
-Ajudar o usuário a identificar visualmente vídeos do YouTube que ele já avaliou (curtido ou com dislike), exibindo badges nas thumbnails e estatísticas locais.
+Ajudar o usuário a identificar visualmente vídeos do YouTube que ele já assistiu ou avaliou (curtido ou com dislike), exibindo badges nas thumbnails e estatísticas locais. Opcionalmente, também pode marcar como visto pelo tempo assistido (~90% do vídeo), quando o usuário ativa essa opção nas configurações — desligada por padrão.
 ```
 
 ### Justificativa de permissões
