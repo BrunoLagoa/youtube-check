@@ -593,17 +593,32 @@ body {
   text-decoration: underline;
 }
 
-.footer-version {
-  font-size: 9px;
-  color: var(--color-text-muted);
-  text-decoration: none;
-  opacity: 0.6;
-  transition: opacity var(--transition);
+.footer-social {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.footer-version:hover {
-  opacity: 1;
-  text-decoration: underline;
+.footer-social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  transition: color var(--transition);
+}
+
+.footer-social-link:hover {
+  color: var(--color-accent);
+}
+
+.footer-social-link svg {
+  width: 13px;
+  height: 13px;
+}
+
+.footer-version {
+  font-size: 9px;
+  opacity: 0.6;
 }
 
 /* ─── TOAST ──────────────────────────────────────────────────────────────────── */
