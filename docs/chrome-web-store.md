@@ -77,14 +77,16 @@ Como funciona
 
 Recursos
 ✓ Detecção automática de Like e Dislike
+✓ Opcional: marcar como visto pelo tempo assistido — sinaliza o vídeo ao atingir uma porcentagem configurável (75%–95%, padrão 90%), mesmo sem avaliar (desligado por padrão)
 ✓ Badge ou overlay configurável nas thumbnails
 ✓ Suporte completo a YouTube Shorts
-✓ Contador de vídeos vistos na página
+✓ Contador flutuante de vídeos vistos na página — dispensável por página e arrastável para qualquer posição (clique duplo restaura o canto)
 ✓ Indicador na página do vídeo ("Você já avaliou este vídeo")
-✓ Popup com estatísticas e histórico recente
+✓ Popup com estatísticas e histórico recente — remova itens individuais ou limpe tudo
+✓ Limpeza automática do histórico (para sempre, ou 30 / 90 / 180 / 365 dias)
 ✓ Exportar e importar dados (JSON)
 ✓ Configurações sincronizadas entre dispositivos (Chrome Sync)
-✓ Opcional: marcar como visto pelo tempo assistido (~90%), mesmo sem avaliar (desligado por padrão)
+✓ Tela de boas-vindas na instalação e interface em Inglês / Português
 
 Privacidade
 • Nenhum dado é enviado para servidores externos
@@ -164,17 +166,15 @@ Use `icons/icon-128.png` (já incluído no projeto).
 
 ---
 
-## Passo 6 — Notas da versão (v1.1.0)
+## Passo 6 — Notas da versão (What's new — v1.4.0)
+
+Cobre tudo desde a última versão publicada (1.2.1): mudanças das 1.3.0 e 1.4.0.
 
 ```
-Lançamento inicial na Chrome Web Store.
-
-• Badges "Visualizado" em vídeos curtidos ou com dislike
-• Suporte a Home, Busca, Canal, Playlists e Shorts
-• Popup com estatísticas, exportação e importação
-• Configurações personalizáveis (cor, texto, overlay)
-• Contador de vídeos vistos na sessão de Shorts
-• Dados 100% locais — sem servidores externos
+• Mark videos as viewed by watch time — new opt-in setting (off by default) that flags a video once you've watched a configurable amount of it (75%–95%, default 90%), even without a Like or Dislike
+• The floating page counter can now be dragged anywhere on screen (double-click to reset the corner), and stays dismissible per page
+• Manage your history: remove individual videos from the popup, or set automatic cleanup (keep forever, or 30 / 90 / 180 / 365 days)
+• New welcome page on install with a quick 3-step guide, plus a friendlier empty popup state
 ```
 
 ---
