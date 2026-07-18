@@ -73,7 +73,7 @@ YouTube Check ajuda você a não perder tempo com vídeos que já avaliou.
 Como funciona
 • Abra um vídeo no YouTube e dê Like ou Dislike
 • A extensão salva a avaliação localmente no seu navegador
-• Ao navegar (Home, Busca, Canal, Playlists, Shorts…), vídeos já avaliados aparecem com o badge "✓ Visualizado"
+• Ao navegar (Home, Busca, Canal, Playlists, Shorts e a lista de recomendados ao lado do vídeo), vídeos já avaliados aparecem com o badge "✓ Visualizado"
 
 Recursos
 ✓ Detecção automática de Like e Dislike
@@ -166,11 +166,18 @@ Use `icons/icon-128.png` (já incluído no projeto).
 
 ---
 
-## Passo 6 — Notas da versão (What's new — v1.4.0)
+## Passo 6 — Notas da versão (What's new — v1.4.1)
 
-Cobre tudo desde a última versão publicada (1.2.1): mudanças das 1.3.0 e 1.4.0.
+Se a v1.4.0 já foi publicada, use apenas a nota da 1.4.1:
 
 ```
+• Viewed badges now also appear on the "Up next" / suggested videos list beside the video you're watching — YouTube's newer card layout is now supported, and these videos count toward the on-page counter too
+```
+
+Caso publique acumulando desde a 1.2.1, some as notas da 1.3.0/1.4.0 abaixo:
+
+```
+• Viewed badges now also appear on the "Up next" / suggested videos list beside the video you're watching (newer YouTube card layout), counted on the page counter too
 • Mark videos as viewed by watch time — new opt-in setting (off by default) that flags a video once you've watched a configurable amount of it (75%–95%, default 90%), even without a Like or Dislike
 • The floating page counter can now be dragged anywhere on screen (double-click to reset the corner), and stays dismissible per page
 • Manage your history: remove individual videos from the popup, or set automatic cleanup (keep forever, or 30 / 90 / 180 / 365 days)

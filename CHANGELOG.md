@@ -2,6 +2,16 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.4.1] - 2026-07-18
+
+### Added
+
+- Badge "Visualizado" agora também aparece nos vídeos da **lista lateral** ("A seguir" / recomendados) da página de um vídeo. O YouTube passou a renderizar esses cards com o novo componente `yt-lockup-view-model`, que não era detectado — agora é. O contador de página também passa a contabilizá-los
+
+### Fixed
+
+- Cards de vídeo no layout atual do YouTube (`yt-lockup-view-model`) não recebiam badge nem entravam na contagem
+
 ## [1.4.0] - 2026-07-03
 
 ### Added

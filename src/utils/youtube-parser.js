@@ -94,7 +94,8 @@ const YTParser = (() => {
   const VIDEO_ELEMENT_TAGS = [
     'ytd-rich-item-renderer',          // Home grid
     'ytd-video-renderer',              // Search results, sidebar
-    'ytd-compact-video-renderer',      // Compact sidebar (watch page)
+    'ytd-compact-video-renderer',      // Compact sidebar (watch page, legacy layout)
+    'yt-lockup-view-model',            // Watch page sidebar "up next" (current layout)
     'ytd-grid-video-renderer',         // Channel / Playlist grid
     'ytd-playlist-video-renderer',     // Playlist list view
     'ytd-reel-item-renderer',          // Shorts shelf items (home page shelf)
@@ -216,16 +217,23 @@ const YTParser = (() => {
     const videoId = extractVideoId(href);
     if (!videoId) return null;
 
-    // Title
+    // Title — includes the current lockup layout (yt-lockup-view-model),
+    // whose title lives in a .yt-lockup-metadata-view-model__title anchor.
     const titleEl =
       el.querySelector('#video-title') ||
       el.querySelector('h3 a') ||
       el.querySelector('.title') ||
       el.querySelector('yt-formatted-string#video-title') ||
+      el.querySelector('a.yt-lockup-metadata-view-model__title') ||
+      el.querySelector('.yt-lockup-metadata-view-model__title') ||
+      el.querySelector('[role="text"]') ||
       el.querySelector('[aria-label]');
 
     const title = titleEl
-      ? (titleEl.getAttribute('title') || titleEl.textContent || '').trim()
+      ? (titleEl.getAttribute('title') ||
+         titleEl.getAttribute('aria-label') ||
+         titleEl.textContent ||
+         '').trim()
       : '';
 
     // Channel name
@@ -245,10 +253,12 @@ const YTParser = (() => {
       el.querySelector('img#img') ||
       el.querySelector('img');
 
+    // Lockup cards lazy-load the <img>, so src is often empty on first pass —
+    // fall back to the canonical thumbnail derived from the video ID.
     const thumbnail =
       thumbEl?.getAttribute('src') ||
       thumbEl?.getAttribute('data-thumb') ||
-      '';
+      `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 
     const url = `https://www.youtube.com/watch?v=${videoId}`;
 
@@ -643,6 +653,8 @@ const YTParser = (() => {
       el.querySelector('ytd-thumbnail') ||
       el.querySelector('a#thumbnail') ||
       el.querySelector('.ytd-thumbnail') ||
+      el.querySelector('yt-thumbnail-view-model') ||             // current lockup layout
+      el.querySelector('.yt-lockup-view-model-wiz__content-image') ||
       el.querySelector('yt-image') ||
       el
     );

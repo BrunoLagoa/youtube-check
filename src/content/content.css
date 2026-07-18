@@ -156,14 +156,16 @@
 
 /* ─── HOVER EFFECT ────────────────────────────────────────────────────────────── */
 ytd-thumbnail:hover .ytcheck-badge,
-a#thumbnail:hover .ytcheck-badge {
+a#thumbnail:hover .ytcheck-badge,
+yt-thumbnail-view-model:hover .ytcheck-badge {
   transform: scale(1.05);
   transition: transform 0.15s ease;
 }
 
 /* ─── VIEWED CARD TINT ─────────────────────────────────────────────────────────── */
 [data-ytcheck-viewed="true"] ytd-thumbnail::after,
-[data-ytcheck-viewed="true"] a#thumbnail::after {
+[data-ytcheck-viewed="true"] a#thumbnail::after,
+[data-ytcheck-viewed="true"] yt-thumbnail-view-model::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -175,7 +177,8 @@ a#thumbnail:hover .ytcheck-badge {
 }
 
 [data-ytcheck-viewed="true"]:hover ytd-thumbnail::after,
-[data-ytcheck-viewed="true"]:hover a#thumbnail::after {
+[data-ytcheck-viewed="true"]:hover a#thumbnail::after,
+[data-ytcheck-viewed="true"]:hover yt-thumbnail-view-model::after {
   opacity: 0.7;
 }
 
