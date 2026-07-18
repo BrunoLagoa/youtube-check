@@ -201,8 +201,16 @@ Use `icons/icon-128.png` (já incluído no projeto).
 
 Se a v1.4.0 já foi publicada, use apenas a nota da 1.4.1:
 
+**English**
+
 ```
 • Viewed badges now also appear on the "Up next" / suggested videos list beside the video you're watching — YouTube's newer card layout is now supported, and these videos count toward the on-page counter too
+```
+
+**Português (Brasil)**
+
+```
+• O badge "Visualizado" agora também aparece na lista de recomendados ("A seguir") ao lado do vídeo que você está assistindo — o layout novo de cards do YouTube passou a ser reconhecido, e esses vídeos também entram na contagem da página
 ```
 
 Caso publique acumulando desde a 1.2.1, some as notas da 1.3.0/1.4.0 abaixo:
