@@ -1,26 +1,16 @@
-<!--
-Texto pronto para colar na listagem da Chrome Web Store — PORTUGUÊS (BRASIL).
-Manter em sincronia com docs/store-description.en.md e atualizar a cada release.
-Versão atual: 1.4.1
--->
+Listagem da Chrome Web Store — PORTUGUÊS (BRASIL). Copie cada bloco abaixo (o texto sob a linha [ RÓTULO ]) direto no campo correspondente do dashboard.
+Manter em sincronia com store-description.en.md. Versão atual: 1.4.1
 
-# Listagem da loja — Português (Brasil)
+[ NOME ]
 
-## Nome
-
-```
 YouTube Check
-```
 
-## Descrição curta (máx. 132 caracteres)
+[ DESCRIÇÃO CURTA — máx. 132 caracteres ]
 
-```
 Marca vídeos do YouTube que você já avaliou (Like ou Dislike) com o badge Visualizado.
-```
 
-## Descrição detalhada
+[ DESCRIÇÃO DETALHADA ]
 
-```
 YouTube Check ajuda você a não perder tempo com vídeos que já avaliou.
 
 Como funciona
@@ -47,10 +37,7 @@ Privacidade
 • Você pode limpar o histórico a qualquer momento
 
 Ideal para quem assiste muito YouTube e quer saber rapidamente o que já passou pelo feed.
-```
 
-## Novidades — versão 1.4.1
+[ NOVIDADES — versão 1.4.1 ]
 
-```
 • O badge "Visualizado" agora também aparece na lista de recomendados ("A seguir") ao lado do vídeo que você está assistindo — o layout novo de cards do YouTube passou a ser reconhecido, e esses vídeos também entram na contagem da página
-```

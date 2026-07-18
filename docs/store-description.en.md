@@ -1,26 +1,16 @@
-<!--
-Ready-to-paste Chrome Web Store listing — ENGLISH.
-Keep in sync with docs/store-description.pt-BR.md and update on every release.
-Current version: 1.4.1
--->
+Chrome Web Store listing — ENGLISH. Copy each block below (the text under a [ LABEL ] line) straight into the matching dashboard field.
+Keep in sync with store-description.pt-BR.md. Current version: 1.4.1
 
-# Store listing — English
+[ NAME ]
 
-## Name
-
-```
 YouTube Check
-```
 
-## Short description (max 132 chars)
+[ SHORT DESCRIPTION — max 132 chars ]
 
-```
 Marks YouTube videos you've rated (Like or Dislike) with a Viewed badge on thumbnails across the platform.
-```
 
-## Detailed description
+[ DETAILED DESCRIPTION ]
 
-```
 YouTube Check helps you avoid re-watching videos you've already rated on YouTube.
 
 HOW IT WORKS
@@ -47,10 +37,7 @@ PRIVACY
 • You can clear your history at any time from the extension popup
 
 Perfect for anyone who watches a lot of YouTube and wants to quickly see what they've already rated.
-```
 
-## What's new — version 1.4.1
+[ WHAT'S NEW — version 1.4.1 ]
 
-```
 • Viewed badges now also appear on the "Up next" / suggested videos list beside the video you're watching — YouTube's newer card layout is now supported, and these videos count toward the on-page counter too
-```
