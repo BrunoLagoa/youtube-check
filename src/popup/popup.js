@@ -119,9 +119,16 @@ async function renderHistory() {
     const li = document.createElement('li');
     const thumbSrc = video.thumbnail || `https://i.ytimg.com/vi/${video.videoId}/mqdefault.jpg`;
 
-    const statusBadge = video.liked
-      ? `<span class="history-badge history-badge--liked">👍 ${YTCheckI18n.t('liked')}</span>`
-      : `<span class="history-badge history-badge--disliked">👎 ${YTCheckI18n.t('disliked')}</span>`;
+    // A video can also be viewed purely by watch time — without that third
+    // case it would be mislabelled as disliked.
+    let statusBadge;
+    if (video.liked) {
+      statusBadge = `<span class="history-badge history-badge--liked">👍 ${YTCheckI18n.t('liked')}</span>`;
+    } else if (video.disliked) {
+      statusBadge = `<span class="history-badge history-badge--disliked">👎 ${YTCheckI18n.t('disliked')}</span>`;
+    } else {
+      statusBadge = `<span class="history-badge history-badge--watched">▶ ${YTCheckI18n.t('watchedByTime')}</span>`;
+    }
 
     li.innerHTML = `
       <a class="history-item" href="${video.url || `https://youtube.com/watch?v=${video.videoId}`}" target="_blank" title="${video.title || video.videoId}">
@@ -232,29 +239,21 @@ els.importFile.addEventListener('change', (e) => {
 
   const reader = new FileReader();
   reader.onload = async (event) => {
-    try {
-      const text = event.target.result;
-      const parsed = JSON.parse(text);
-      const incoming = parsed.videos || parsed;
+    // Delegated to the storage layer so `viewed` is derived exactly like
+    // everywhere else — a local copy of this merge used to drop
+    // watchedByProgress, un-marking videos tracked by watch time.
+    const { imported, reason } = await YTCheckStorage.importVideos(event.target.result);
 
-      if (typeof incoming !== 'object' || Array.isArray(incoming)) {
-        showToast(YTCheckI18n.t('invalidFile'), 'error');
-        return;
-      }
-
-      chrome.storage.local.get(['videos'], (result) => {
-        const videos = { ...(result.videos || {}), ...incoming };
-        for (const id of Object.keys(videos)) {
-          videos[id].viewed = !!(videos[id].liked || videos[id].disliked);
-        }
-        chrome.storage.local.set({ videos }, async () => {
-          await refreshStats();
-          showToast(YTCheckI18n.t('videosImported', Object.keys(incoming).length), 'success');
-        });
-      });
-    } catch {
-      showToast(YTCheckI18n.t('jsonError'), 'error');
+    if (imported > 0) {
+      await refreshStats();
+      showToast(YTCheckI18n.t('videosImported', imported), 'success');
+    } else {
+      showToast(
+        YTCheckI18n.t(reason === 'parse' ? 'jsonError' : 'invalidFile'),
+        'error'
+      );
     }
+
     els.importFile.value = '';
   };
   reader.readAsText(file);

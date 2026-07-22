@@ -1,5 +1,5 @@
 Chrome Web Store listing — ENGLISH. Copy each block below (the text under a [ LABEL ] line) straight into the matching dashboard field.
-Keep in sync with store-description.pt-BR.md. Current version: 1.4.1
+Keep in sync with store-description.pt-BR.md. Current version: 1.4.2
 
 [ NAME ]
 
@@ -38,6 +38,8 @@ PRIVACY
 
 Perfect for anyone who watches a lot of YouTube and wants to quickly see what they've already rated.
 
-[ WHAT'S NEW — version 1.4.1 ]
+[ WHAT'S NEW — version 1.4.2 ]
 
-• Viewed badges now also appear on the "Up next" / suggested videos list beside the video you're watching — YouTube's newer card layout is now supported, and these videos count toward the on-page counter too
+• Fixed: importing a JSON backup no longer drops videos that were marked as viewed by watch time
+• Fixed: videos marked by watch time alone are no longer labelled "Disliked" in the popup history — they now have their own "Watched" tag
+• Fixed: turning "Hide viewed videos" or "Highlight unviewed" off now restores the listing straight away, with no page reload needed

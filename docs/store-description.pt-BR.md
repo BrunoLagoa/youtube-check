@@ -1,5 +1,5 @@
 Listagem da Chrome Web Store — PORTUGUÊS (BRASIL). Copie cada bloco abaixo (o texto sob a linha [ RÓTULO ]) direto no campo correspondente do dashboard.
-Manter em sincronia com store-description.en.md. Versão atual: 1.4.1
+Manter em sincronia com store-description.en.md. Versão atual: 1.4.2
 
 [ NOME ]
 
@@ -38,6 +38,8 @@ Privacidade
 
 Ideal para quem assiste muito YouTube e quer saber rapidamente o que já passou pelo feed.
 
-[ NOVIDADES — versão 1.4.1 ]
+[ NOVIDADES — versão 1.4.2 ]
 
-• O badge "Visualizado" agora também aparece na lista de recomendados ("A seguir") ao lado do vídeo que você está assistindo — o layout novo de cards do YouTube passou a ser reconhecido, e esses vídeos também entram na contagem da página
+• Corrigido: importar um backup JSON não descarta mais os vídeos marcados como vistos pelo tempo assistido
+• Corrigido: vídeos marcados apenas pelo tempo assistido não aparecem mais como "Não curtido" no histórico do popup — agora têm o selo "Assistido"
+• Corrigido: desligar "Ocultar vídeos visualizados" ou "Destacar não visualizados" volta a exibir os vídeos na hora, sem precisar recarregar a página

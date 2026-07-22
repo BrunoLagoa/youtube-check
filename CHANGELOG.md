@@ -2,6 +2,19 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.4.2] - 2026-07-22
+
+### Fixed
+
+- Importar um backup JSON não descartava mais os vídeos marcados como vistos **pelo tempo assistido** — o import do popup recalculava o status ignorando `watchedByProgress` e esses vídeos voltavam a aparecer como não vistos. O popup agora usa a mesma rotina de import do restante da extensão
+- Vídeos marcados apenas pelo tempo assistido (sem like nem dislike) apareciam no histórico do popup com o selo "👎 Não curtido". Agora exibem um selo próprio "▶ Assistido"
+- Desligar "Ocultar vídeos visualizados" ou "Destacar não visualizados" não restaurava os cards na página até apertar F5 — os estilos aplicados nunca eram removidos. Agora a mudança vale na hora, e desativar a extensão também limpa tudo
+- Registros importados sem data de atualização recebiam data vazia e podiam ser apagados na primeira limpeza automática de histórico
+
+### Changed
+
+- Descrição da extensão na Chrome Web Store agora é traduzida (aparece em português para quem usa o navegador em português)
+
 ## [1.4.1] - 2026-07-18
 
 ### Added

@@ -592,6 +592,12 @@ body {
   color: var(--color-disliked);
 }
 
+/* Viewed by watch time only — no Like/Dislike given */
+.history-badge--watched {
+  background: var(--color-accent-dim);
+  color: var(--color-accent);
+}
+
 .history-date {
   font-size: 9.5px;
   color: var(--color-text-muted);

@@ -870,12 +870,32 @@
   }
 
   /**
+   * Drop the inline styles applied by applyVisibilitySettings, restoring the
+   * card to YouTube's own layout.
+   * @param {Element} el
+   */
+  function clearVisibilityStyles(el) {
+    el.style.opacity = '';
+    el.style.pointerEvents = '';
+    el.style.height = '';
+    el.style.overflow = '';
+    el.style.margin = '';
+    el.style.padding = '';
+    el.style.outline = '';
+    el.style.borderRadius = '';
+  }
+
+  /**
    * Apply hide/highlight based on settings.
+   * Always starts from a clean slate — otherwise turning a setting off would
+   * leave the previous inline styles behind until a full page reload.
    * @param {Element} el
    * @param {string} videoId
    */
   function applyVisibilitySettings(el, videoId) {
     const isViewed = viewedIds.has(videoId);
+
+    clearVisibilityStyles(el);
 
     if (settings.hideViewed && isViewed) {
       el.style.opacity = '0';
@@ -895,23 +915,19 @@
   function removeBadgeFromElement(el) {
     el.querySelectorAll('.ytcheck-badge, .ytcheck-overlay').forEach((badge) => badge.remove());
     delete el.dataset.ytcheckViewed;
-    el.style.opacity = '';
-    el.style.pointerEvents = '';
-    el.style.height = '';
-    el.style.overflow = '';
-    el.style.margin = '';
-    el.style.padding = '';
-    el.style.outline = '';
-    el.style.borderRadius = '';
+    clearVisibilityStyles(el);
   }
 
   /**
-   * Remove all ytcheck badges/overlays from the DOM.
+   * Remove all ytcheck badges/overlays from the DOM, along with the inline
+   * styles we applied — leaving them behind would keep cards hidden or
+   * outlined after the feature is switched off.
    */
   function removeAllBadges() {
     document.querySelectorAll('.ytcheck-badge, .ytcheck-overlay').forEach((el) => el.remove());
-    document.querySelectorAll('[data-ytcheck-viewed]').forEach((el) => {
+    document.querySelectorAll('[data-ytcheck-id]').forEach((el) => {
       delete el.dataset.ytcheckViewed;
+      clearVisibilityStyles(el);
     });
   }
 
@@ -932,8 +948,14 @@
     const elements = document.querySelectorAll('[data-ytcheck-id]');
     for (const el of elements) {
       const videoId = el.dataset.ytcheckId;
-      if (videoId && viewedIds.has(videoId)) {
-        applyBadge(el, videoId);
+      if (!videoId) continue;
+
+      if (viewedIds.has(videoId)) {
+        applyBadge(el, videoId); // also re-applies visibility settings
+      } else {
+        // Unviewed cards still need a pass so the "highlight unviewed" outline
+        // is re-applied (or dropped) after removeAllBadges cleared it.
+        applyVisibilitySettings(el, videoId);
       }
     }
 

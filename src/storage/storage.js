@@ -227,45 +227,58 @@ const YTCheckStorage = (() => {
 
   /**
    * Import videos from a JSON string (merges with existing data).
+   * `reason` tells apart a malformed JSON file ('parse') from valid JSON that
+   * isn't a video map ('format'), so callers can show the right message.
    * @param {string} jsonString
-   * @returns {Promise<{imported: number, errors: number}>}
+   * @returns {Promise<{imported: number, errors: number, reason: string|null}>}
    */
   async function importVideos(jsonString) {
     return safeStorage((resolve) => {
       let imported = 0;
       let errors = 0;
 
+      let incoming;
       try {
         const parsed = JSON.parse(jsonString);
-        const incoming = parsed.videos || parsed;
-
-        if (typeof incoming !== 'object') {
-          resolve({ imported: 0, errors: 1 });
-          return;
-        }
-
-        chrome.storage.local.get(['videos'], (result) => {
-          const videos = result.videos || {};
-          for (const [id, data] of Object.entries(incoming)) {
-            if (id && typeof data === 'object') {
-              videos[id] = {
-                ...videos[id],
-                ...data,
-                viewed: !!(data.liked || data.disliked || data.watchedByProgress),
-              };
-              imported++;
-            } else {
-              errors++;
-            }
-          }
-          chrome.storage.local.set({ videos }, () => {
-            resolve({ imported, errors });
-          });
-        });
+        incoming = parsed?.videos || parsed;
       } catch {
-        resolve({ imported: 0, errors: 1 });
+        resolve({ imported: 0, errors: 1, reason: 'parse' });
+        return;
       }
-    }, { imported: 0, errors: 1 });
+
+      // A video map is a plain object keyed by videoId — arrays and null are not.
+      if (!incoming || typeof incoming !== 'object' || Array.isArray(incoming)) {
+        resolve({ imported: 0, errors: 1, reason: 'format' });
+        return;
+      }
+
+      chrome.storage.local.get(['videos'], (result) => {
+        const videos = result.videos || {};
+        for (const [id, data] of Object.entries(incoming)) {
+          if (!id || !data || typeof data !== 'object' || Array.isArray(data)) {
+            errors++;
+            continue;
+          }
+
+          const existing = videos[id] || {};
+          const merged = { ...existing, ...data };
+
+          videos[id] = {
+            ...merged,
+            videoId: merged.videoId || id,
+            // Same derivation as saveVideo — never trust an incoming `viewed`.
+            viewed: !!(merged.liked || merged.disliked || merged.watchedByProgress),
+            // Without a timestamp the record would look infinitely old and be
+            // wiped by the first retention prune.
+            updatedAt: merged.updatedAt || Date.now(),
+          };
+          imported++;
+        }
+        chrome.storage.local.set({ videos }, () => {
+          resolve({ imported, errors, reason: imported === 0 ? 'format' : null });
+        });
+      });
+    }, { imported: 0, errors: 1, reason: 'format' });
   }
 
   /**

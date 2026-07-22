@@ -197,23 +197,27 @@ Use `icons/icon-128.png` (já incluído no projeto).
 
 ---
 
-## Passo 6 — Notas da versão (What's new — v1.4.1)
+## Passo 6 — Notas da versão (What's new — v1.4.2)
 
-Se a v1.4.0 já foi publicada, use apenas a nota da 1.4.1:
+Se a v1.4.1 já foi publicada, use apenas a nota da 1.4.2:
 
 **English**
 
 ```
-• Viewed badges now also appear on the "Up next" / suggested videos list beside the video you're watching — YouTube's newer card layout is now supported, and these videos count toward the on-page counter too
+• Fixed: importing a JSON backup no longer drops videos that were marked as viewed by watch time
+• Fixed: videos marked by watch time alone are no longer labelled "Disliked" in the popup history — they now have their own "Watched" tag
+• Fixed: turning "Hide viewed videos" or "Highlight unviewed" off now restores the listing straight away, with no page reload needed
 ```
 
 **Português (Brasil)**
 
 ```
-• O badge "Visualizado" agora também aparece na lista de recomendados ("A seguir") ao lado do vídeo que você está assistindo — o layout novo de cards do YouTube passou a ser reconhecido, e esses vídeos também entram na contagem da página
+• Corrigido: importar um backup JSON não descarta mais os vídeos marcados como vistos pelo tempo assistido
+• Corrigido: vídeos marcados apenas pelo tempo assistido não aparecem mais como "Não curtido" no histórico do popup — agora têm o selo "Assistido"
+• Corrigido: desligar "Ocultar vídeos visualizados" ou "Destacar não visualizados" volta a exibir os vídeos na hora, sem precisar recarregar a página
 ```
 
-Caso publique acumulando desde a 1.2.1, some as notas da 1.3.0/1.4.0 abaixo:
+Caso publique acumulando desde a 1.2.1, some as notas da 1.3.0/1.4.x abaixo:
 
 ```
 • Viewed badges now also appear on the "Up next" / suggested videos list beside the video you're watching (newer YouTube card layout), counted on the page counter too
@@ -222,6 +226,10 @@ Caso publique acumulando desde a 1.2.1, some as notas da 1.3.0/1.4.0 abaixo:
 • Manage your history: remove individual videos from the popup, or set automatic cleanup (keep forever, or 30 / 90 / 180 / 365 days)
 • New welcome page on install with a quick 3-step guide, plus a friendlier empty popup state
 ```
+
+> A partir da v1.4.2 a descrição da extensão no `manifest.json` usa `__MSG_extDescription__`,
+> traduzida em `_locales/{en,pt_BR}/messages.json`. Ao mudar a descrição curta da listagem,
+> atualize também esses dois arquivos para não divergirem.
 
 ---
 

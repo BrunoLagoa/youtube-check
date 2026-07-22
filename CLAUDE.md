@@ -59,7 +59,7 @@ Validate the exact live selectors before coding — YouTube's real DOM is the au
 ### Two independent i18n systems — don't conflate them
 
 - **Runtime UI/badge text**: the custom `YTCheckI18n` + `YTCheckMessages` (`src/i18n/`), supporting `en` / `pt-BR` with locale `auto | en | pt-BR`. This drives everything the user sees.
-- **`_locales/`**: Chrome's native i18n, used **only** to localize the manifest's `extName` (`__MSG_extName__`). It is not the runtime catalog.
+- **`_locales/`**: Chrome's native i18n, used **only** for the manifest's own strings — `extName` (`__MSG_extName__`) and `extDescription` (`__MSG_extDescription__`, the store listing's short description). It is not the runtime catalog. Changing the listing's short description means editing `_locales/en` **and** `_locales/pt_BR`.
 
 ### Background service worker
 
