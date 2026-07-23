@@ -46,6 +46,8 @@ Every storage op is wrapped in `safeStorage`, which no-ops with a fallback when 
 
 SPA navigation is caught by `YTDomObserver.watchNavigation`, which patches `history.pushState`/`replaceState` and listens for `yt-navigate-finish` (YouTube fires no standard navigation event).
 
+**Pure-CSS features are toggled by a class on `<html>`**, not by DOM injection: `settings.fullTitle` ("show full video title") only makes `content.js` call `applyFullTitleSetting()`, which flips `html.ytcheck-full-title`; the rules live in the *full video title* block of `content.css` and target the title selectors directly. Because the CSS is scoped to that class, turning the setting off restores YouTube's own layout with no cleanup pass. Follow this pattern for other layout tweaks — and keep the title selectors layered (modern `*ViewModelTitle` → legacy `#video-title`) like `youtube-parser.js` does.
+
 ### Adding support for a new YouTube surface (common task)
 
 YouTube A/B-tests its DOM and migrates components (e.g. the watch-page sidebar moved from `ytd-compact-video-renderer` to the newer `yt-lockup-view-model`). To make badges appear on a card type that currently has none:

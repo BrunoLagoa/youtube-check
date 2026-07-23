@@ -11,7 +11,8 @@ Chrome extension that automatically marks YouTube videos you've already rated (L
 - ✅ Works on Home, Search, Channel, Playlists, Related, Subscriptions, Explore, Shorts
 - ✅ MutationObserver for infinite scroll without reloading
 - ✅ Popup with statistics and actions (export/import/clear)
-- ✅ Settings page (color, text, badge/overlay mode, hide viewed)
+- ✅ Optional full video title on cards (no "…" cut-off)
+- ✅ Settings page (color, text, badge/overlay mode, hide viewed, full title)
 - ✅ Persistence via `chrome.storage.local` and `chrome.storage.sync`
 - ✅ Manifest V3 + optimized performance
 

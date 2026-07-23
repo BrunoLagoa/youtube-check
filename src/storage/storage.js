@@ -49,6 +49,7 @@ const YTCheckStorage = (() => {
     hideViewed: false,
     highlightUnviewed: false,
     showPageCounter: true,
+    fullTitle: false,           // opt-in: show the full video title on cards instead of YouTube's 2-line clamp
     locale: 'auto',             // 'auto' | 'en' | 'pt-BR'
     historyRetentionDays: 0,    // 0 = keep forever (default); otherwise auto-prune older entries
     counterPositionX: null,     // % of viewport width; null = default bottom-right corner

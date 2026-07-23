@@ -182,6 +182,32 @@ yt-thumbnail-view-model:hover .ytcheck-badge {
   opacity: 0.7;
 }
 
+/* ─── FULL VIDEO TITLE ────────────────────────────────────────────────────────
+ * Opt-in (settings.fullTitle): removes YouTube's 2-line clamp from card titles
+ * so long titles wrap instead of ending in "…". Keyed off a class on <html>
+ * toggled by content.js, so switching the setting off restores YouTube's own
+ * layout with nothing left behind.
+ *
+ * Layered selectors, same defensive style as youtube-parser.js: modern
+ * *-view-model components first, legacy #video-title renderers as fallback.
+ * The watch page's own <h1> is deliberately untouched — it has YouTube's
+ * native "…more" expander.
+ */
+html.ytcheck-full-title a.ytLockupMetadataViewModelTitle,          /* home, search & watch sidebar (current layout) */
+html.ytcheck-full-title .yt-lockup-metadata-view-model-wiz__title, /* previous lockup naming */
+html.ytcheck-full-title .yt-lockup-metadata-view-model__title,
+html.ytcheck-full-title .shortsLockupViewModelHostMetadataTitle,   /* Shorts shelf & Shorts grid */
+html.ytcheck-full-title #video-title,                              /* legacy ytd-* renderers */
+html.ytcheck-full-title #video-title-link {
+  -webkit-line-clamp: unset !important;
+  line-clamp: unset !important;
+  max-height: none !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  display: block !important;
+  white-space: normal !important;
+}
+
 /* ─── PAGE COUNTER WIDGET ───────────────────────────────────────────────────── */
 #ytcheck-page-counter {
   position: fixed;

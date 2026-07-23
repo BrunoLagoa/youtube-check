@@ -2,6 +2,12 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.5.0] - 2026-07-23
+
+### Added
+
+- Nova opção **"Exibir título completo"** (desligada por padrão): remove o corte de 2 linhas do YouTube nos cards de vídeo, mostrando o título inteiro sem "…" e sem precisar passar o mouse. Vale para Home, Busca, Canal, Playlists, cards de Shorts e a lista de recomendados ao lado do vídeo. O título da página do vídeo em si não é alterado (ele já tem o "…mais" nativo do YouTube)
+
 ## [1.4.2] - 2026-07-22
 
 ### Fixed

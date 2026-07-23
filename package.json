@@ -1,6 +1,6 @@
 {
   "name": "youtube-check",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "private": true,
   "description": "Chrome extension that marks rated YouTube videos as viewed",
   "scripts": {

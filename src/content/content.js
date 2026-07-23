@@ -20,7 +20,17 @@
     YTCheckI18n.setLocale(YTCheckI18n.resolveLocale(settings.locale));
   }
 
+  /**
+   * Toggle the hook class the "full video title" CSS in content.css keys off.
+   * Independent from `settings.enabled` (which only governs the viewed marking),
+   * and removing the class restores YouTube's own 2-line clamp — no cleanup needed.
+   */
+  function applyFullTitleSetting() {
+    document.documentElement?.classList.toggle('ytcheck-full-title', !!settings.fullTitle);
+  }
+
   applyI18nFromSettings();
+  applyFullTitleSetting();
 
   /** @type {MutationObserver|null} Observer for like/dislike buttons */
   let likeObserver = null;
@@ -134,6 +144,7 @@
   async function _executePageChange(url) {
     settings = await YTCheckStorage.getSettings();
     applyI18nFromSettings();
+    applyFullTitleSetting();
 
     const videoId = YTParser.extractVideoId(url);
     const isShorts = YTParser.isShortsPlayer();
@@ -939,6 +950,8 @@
     viewedIds = await YTCheckStorage.getViewedIds();
     settings = await YTCheckStorage.getSettings();
     applyI18nFromSettings();
+    // Before the early return below: full titles don't depend on `enabled`.
+    applyFullTitleSetting();
 
     if (!settings.enabled) {
       cleanupWatchProgressTracking();

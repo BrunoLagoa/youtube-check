@@ -11,7 +11,8 @@ Extensão Chrome que marca automaticamente vídeos do YouTube já avaliados (Lik
 - ✅ Funciona em Home, Busca, Canal, Playlists, Relacionados, Inscrições, Explorar, Shorts
 - ✅ MutationObserver para scroll infinito sem recarregar
 - ✅ Popup com estatísticas e ações (exportar/importar/limpar)
-- ✅ Página de configurações (cor, texto, modo badge/overlay, ocultar visualizados)
+- ✅ Título completo dos vídeos nos cards (opcional, sem o corte em "…")
+- ✅ Página de configurações (cor, texto, modo badge/overlay, ocultar visualizados, título completo)
 - ✅ Persistência via `chrome.storage.local` e `chrome.storage.sync`
 - ✅ Manifest V3 + Performance otimizada
 

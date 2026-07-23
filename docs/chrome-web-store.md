@@ -79,6 +79,7 @@ Recursos
 ✓ Detecção automática de Like e Dislike
 ✓ Opcional: marcar como visto pelo tempo assistido — sinaliza o vídeo ao atingir uma porcentagem configurável (75%–95%, padrão 90%), mesmo sem avaliar (desligado por padrão)
 ✓ Badge ou overlay configurável nas thumbnails
+✓ Opcional: exibir o título completo dos vídeos nos cards, sem o corte em "…"
 ✓ Suporte completo a YouTube Shorts
 ✓ Contador flutuante de vídeos vistos na página — dispensável por página e arrastável para qualquer posição (clique duplo restaura o canto)
 ✓ Indicador na página do vídeo ("Você já avaliou este vídeo")
@@ -110,6 +111,7 @@ FEATURES
 ✓ Automatic Like/Dislike detection
 ✓ Optional: mark as viewed by watch time — flags a video once you've watched a configurable amount of it (75%–95%, default 90%), even without rating it (off by default)
 ✓ Configurable badge or overlay on thumbnails
+✓ Optional: show the full video title on cards, with no "…" cut-off
 ✓ Full YouTube Shorts support
 ✓ Floating page counter (viewed/total on the current listing) — dismissible per page and draggable to any position (double-click to reset)
 ✓ Watch page indicator ("You already rated this video")
@@ -197,24 +199,28 @@ Use `icons/icon-128.png` (já incluído no projeto).
 
 ---
 
-## Passo 6 — Notas da versão (What's new — v1.4.2)
+## Passo 6 — Notas da versão (What's new — v1.5.0)
 
-Se a v1.4.1 já foi publicada, use apenas a nota da 1.4.2:
+Se a v1.4.2 já foi publicada, use apenas a nota da 1.5.0:
 
 **English**
 
 ```
-• Fixed: importing a JSON backup no longer drops videos that were marked as viewed by watch time
-• Fixed: videos marked by watch time alone are no longer labelled "Disliked" in the popup history — they now have their own "Watched" tag
-• Fixed: turning "Hide viewed videos" or "Highlight unviewed" off now restores the listing straight away, with no page reload needed
+• New: "Show full video title" setting — displays the complete title on video cards, with no "…" cut-off and no hovering needed (Home, Search, Channels, Playlists, Shorts and suggested videos). Off by default
 ```
 
 **Português (Brasil)**
 
 ```
-• Corrigido: importar um backup JSON não descarta mais os vídeos marcados como vistos pelo tempo assistido
-• Corrigido: vídeos marcados apenas pelo tempo assistido não aparecem mais como "Não curtido" no histórico do popup — agora têm o selo "Assistido"
-• Corrigido: desligar "Ocultar vídeos visualizados" ou "Destacar não visualizados" volta a exibir os vídeos na hora, sem precisar recarregar a página
+• Novo: opção "Exibir título completo" — mostra o título inteiro dos vídeos nos cards, sem o corte em "…" e sem precisar passar o mouse (Home, Busca, Canal, Playlists, Shorts e recomendados). Desligada por padrão
+```
+
+Caso publique acumulando desde a 1.4.1, some as notas da 1.4.2 abaixo:
+
+```
+• Fixed: importing a JSON backup no longer drops videos that were marked as viewed by watch time
+• Fixed: videos marked by watch time alone are no longer labelled "Disliked" in the popup history — they now have their own "Watched" tag
+• Fixed: turning "Hide viewed videos" or "Highlight unviewed" off now restores the listing straight away, with no page reload needed
 ```
 
 Caso publique acumulando desde a 1.2.1, some as notas da 1.3.0/1.4.x abaixo:

@@ -1,5 +1,5 @@
 Listagem da Chrome Web Store — PORTUGUÊS (BRASIL). Copie cada bloco abaixo (o texto sob a linha [ RÓTULO ]) direto no campo correspondente do dashboard.
-Manter em sincronia com store-description.en.md. Versão atual: 1.4.2
+Manter em sincronia com store-description.en.md. Versão atual: 1.5.0
 
 [ NOME ]
 
@@ -22,6 +22,7 @@ Recursos
 ✓ Detecção automática de Like e Dislike
 ✓ Opcional: marcar como visto pelo tempo assistido — sinaliza o vídeo ao atingir uma porcentagem configurável (75%–95%, padrão 90%), mesmo sem avaliar (desligado por padrão)
 ✓ Badge ou overlay configurável nas thumbnails
+✓ Opcional: exibir o título completo dos vídeos nos cards, sem o corte em "…"
 ✓ Suporte completo a YouTube Shorts
 ✓ Contador flutuante de vídeos vistos na página — dispensável por página e arrastável para qualquer posição (clique duplo restaura o canto)
 ✓ Indicador na página do vídeo ("Você já avaliou este vídeo")
@@ -38,8 +39,6 @@ Privacidade
 
 Ideal para quem assiste muito YouTube e quer saber rapidamente o que já passou pelo feed.
 
-[ NOVIDADES — versão 1.4.2 ]
+[ NOVIDADES — versão 1.5.0 ]
 
-• Corrigido: importar um backup JSON não descarta mais os vídeos marcados como vistos pelo tempo assistido
-• Corrigido: vídeos marcados apenas pelo tempo assistido não aparecem mais como "Não curtido" no histórico do popup — agora têm o selo "Assistido"
-• Corrigido: desligar "Ocultar vídeos visualizados" ou "Destacar não visualizados" volta a exibir os vídeos na hora, sem precisar recarregar a página
+• Novo: opção "Exibir título completo" — mostra o título inteiro dos vídeos nos cards, sem o corte em "…" e sem precisar passar o mouse (Home, Busca, Canal, Playlists, Shorts e recomendados). Desligada por padrão

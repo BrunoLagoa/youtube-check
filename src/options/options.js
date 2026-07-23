@@ -12,6 +12,7 @@ const els = {
   enabled:        document.getElementById('toggle-enabled'),
   hideViewed:     document.getElementById('toggle-hide'),
   highlightUnviewed: document.getElementById('toggle-highlight'),
+  fullTitle:      document.getElementById('toggle-full-title'),
   showPageCounter: document.getElementById('toggle-counter'),
   trackWatchProgress: document.getElementById('toggle-watch-progress'),
   watchThreshold: document.getElementById('select-watch-threshold'),
@@ -81,6 +82,7 @@ function applySettingsToUI(settings) {
   els.enabled.checked = settings.enabled;
   els.hideViewed.checked = settings.hideViewed;
   els.highlightUnviewed.checked = settings.highlightUnviewed;
+  els.fullTitle.checked = !!settings.fullTitle;
   els.showPageCounter.checked = settings.showPageCounter !== false;
   els.trackWatchProgress.checked = !!settings.trackWatchProgress;
   els.watchThreshold.value = String(settings.watchProgressThreshold ?? 0.9);
@@ -128,6 +130,7 @@ function collectSettings() {
     enabled: els.enabled.checked,
     hideViewed: els.hideViewed.checked,
     highlightUnviewed: els.highlightUnviewed.checked,
+    fullTitle: els.fullTitle.checked,
     showPageCounter: els.showPageCounter.checked,
     trackWatchProgress: els.trackWatchProgress.checked,
     watchProgressThreshold: parseFloat(els.watchThreshold.value) || 0.9,
@@ -250,7 +253,7 @@ els.btnReset.addEventListener('click', async () => {
   });
 });
 
-[els.enabled, els.hideViewed, els.highlightUnviewed, els.showPageCounter, els.trackWatchProgress, els.watchThreshold, els.retention].forEach((toggle) => {
+[els.enabled, els.hideViewed, els.highlightUnviewed, els.fullTitle, els.showPageCounter, els.trackWatchProgress, els.watchThreshold, els.retention].forEach((toggle) => {
   toggle.addEventListener('change', () => {
     saveSettings();
   });

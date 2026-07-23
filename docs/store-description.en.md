@@ -1,5 +1,5 @@
 Chrome Web Store listing — ENGLISH. Copy each block below (the text under a [ LABEL ] line) straight into the matching dashboard field.
-Keep in sync with store-description.pt-BR.md. Current version: 1.4.2
+Keep in sync with store-description.pt-BR.md. Current version: 1.5.0
 
 [ NAME ]
 
@@ -22,6 +22,7 @@ FEATURES
 ✓ Automatic Like/Dislike detection
 ✓ Optional: mark as viewed by watch time — flags a video once you've watched a configurable amount of it (75%–95%, default 90%), even without rating it (off by default)
 ✓ Configurable badge or overlay on thumbnails
+✓ Optional: show the full video title on cards, with no "…" cut-off
 ✓ Full YouTube Shorts support
 ✓ Floating page counter (viewed/total on the current listing) — dismissible per page and draggable to any position (double-click to reset)
 ✓ Watch page indicator ("You already rated this video")
@@ -38,8 +39,6 @@ PRIVACY
 
 Perfect for anyone who watches a lot of YouTube and wants to quickly see what they've already rated.
 
-[ WHAT'S NEW — version 1.4.2 ]
+[ WHAT'S NEW — version 1.5.0 ]
 
-• Fixed: importing a JSON backup no longer drops videos that were marked as viewed by watch time
-• Fixed: videos marked by watch time alone are no longer labelled "Disliked" in the popup history — they now have their own "Watched" tag
-• Fixed: turning "Hide viewed videos" or "Highlight unviewed" off now restores the listing straight away, with no page reload needed
+• New: "Show full video title" setting — displays the complete title on video cards, with no "…" cut-off and no hovering needed (Home, Search, Channels, Playlists, Shorts and suggested videos). Off by default
