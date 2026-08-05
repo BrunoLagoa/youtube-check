@@ -15,6 +15,17 @@ There is **no build step and no test suite**. `src/` is loaded directly as the e
 
 Verify changes by driving the real extension on youtube.com (badges, counter, watch indicator) — not by unit tests, which don't exist. The browser console + `chrome://extensions` service-worker inspector are the debugging surface.
 
+### Browser automation (Claude in Chrome)
+
+More than one Chrome instance is usually connected to this account, and **only one of them has the unpacked extension loaded**. The right one is the browser named **`Bruno`** (macOS, local) — always work there.
+
+At the start of any browser session:
+
+1. `list_connected_browsers` → find the entry whose `name` is `Bruno`.
+2. `select_browser` with that `deviceId`. Device IDs are not stable across reinstalls/reconnects, so resolve by name, never by a hardcoded ID.
+3. If no `Bruno` entry shows up, fall back to `switch_browser` — it prompts every connected Chrome and the user clicks **Connect** in the right one.
+4. Then `tabs_context_mcp` (with `createIfEmpty: true`) and work in a **new** tab; don't hijack tabs the user already has open.
+
 ## Architecture
 
 ### Module system: globals via injection order (no imports)
