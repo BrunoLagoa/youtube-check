@@ -1,5 +1,5 @@
 Chrome Web Store listing — ENGLISH. Copy each block below (the text under a [ LABEL ] line) straight into the matching dashboard field.
-Keep in sync with store-description.pt-BR.md. Current version: 1.5.0
+Keep in sync with store-description.pt-BR.md. Current version: 1.5.1
 
 [ NAME ]
 
@@ -39,6 +39,9 @@ PRIVACY
 
 Perfect for anyone who watches a lot of YouTube and wants to quickly see what they've already rated.
 
-[ WHAT'S NEW — version 1.5.0 ]
+[ WHAT'S NEW — version 1.5.1 ]
 
-• New: "Show full video title" setting — displays the complete title on video cards, with no "…" cut-off and no hovering needed (Home, Search, Channels, Playlists, Shorts and suggested videos). Off by default
+• Fixed: Like/Dislike detection is reliable again on the watch page — YouTube changed its layout and the extension sometimes read the wrong button, leaving videos unmarked
+• Fixed: already-marked videos are no longer un-marked on their own by an incorrect reading
+• Fixed: liking a video now updates the badge immediately, with no page reload needed
+• Fixed: the "You already rated this video" indicator is back on Shorts

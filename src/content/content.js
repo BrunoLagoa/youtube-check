@@ -416,7 +416,10 @@
     if (likeDetectTimer) clearTimeout(likeDetectTimer);
 
     let attempts = 0;
-    const maxAttempts = YTParser.isShortsPlayer() ? 20 : 8;
+    // detectLikeDislikeState only answers once a laid-out rating button exists,
+    // so these retries are what carry us across YouTube's async mount — worth
+    // being generous rather than giving up and leaving the video unread.
+    const maxAttempts = YTParser.isShortsPlayer() ? 20 : 12;
 
     function attempt() {
       attempts++;
@@ -445,11 +448,17 @@
       : document.title.replace(' - YouTube', '').trim();
 
     const thumbnail = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
-    const channelEl = YTParser.isShortsPlayer()
-      ? (document.querySelector('ytd-reel-video-renderer[is-active] ytd-channel-name') ||
-         document.querySelector('ytd-reel-video-renderer[is-active] #channel-name'))
-      : (document.querySelector('ytd-video-owner-renderer #channel-name yt-formatted-string') ||
-         document.querySelector('#owner #channel-name'));
+
+    // Shorts: the reel no longer carries `is-active`, so go through the parser
+    // rather than querying the document for an attribute that never matches.
+    if (YTParser.isShortsPlayer()) {
+      const channel = YTParser.extractFromShortsPlayer()?.channel || '';
+      return { title, channel, thumbnail };
+    }
+
+    const channelEl =
+      document.querySelector('ytd-video-owner-renderer #channel-name yt-formatted-string') ||
+      document.querySelector('#owner #channel-name');
     const channel = channelEl ? channelEl.textContent.trim() : '';
 
     return { title, channel, thumbnail };
@@ -457,7 +466,7 @@
 
   /**
    * Persist the like/dislike state for the current video.
-   * @param {{ liked: boolean, disliked: boolean }} state
+   * @param {{ liked: boolean, disliked: boolean, dislikeReadable?: boolean }} state
    */
   async function handleLikeDislikeState(state) {
     const videoId = YTParser.isShortsPlayer()
@@ -468,13 +477,20 @@
 
     const existing = await YTCheckStorage.getVideo(videoId);
 
+    // The Shorts player ships no dislike control, so its "not disliked" is an
+    // absence of evidence, not evidence of absence — keep whatever we stored
+    // instead of clearing a dislike recorded on the watch page.
+    const disliked = state.dislikeReadable === false
+      ? !!existing?.disliked
+      : state.disliked;
+
     // Avoid unnecessary writes if nothing changed
     if (
       existing &&
       existing.liked === state.liked &&
-      existing.disliked === state.disliked
+      existing.disliked === disliked
     ) {
-      updateWatchIndicator(state.liked, state.disliked);
+      updateWatchIndicator(state.liked, disliked);
       if (settings.enabled) scheduleCounterUpdate();
       return;
     }
@@ -488,12 +504,12 @@
       thumbnail,
       url: window.location.href,
       liked: state.liked,
-      disliked: state.disliked,
+      disliked,
     });
 
     // Update local cache — keep it if watch-progress already marked it viewed,
     // so removing a like/dislike doesn't un-mark a video watched to completion.
-    if (state.liked || state.disliked || existing?.watchedByProgress) {
+    if (state.liked || disliked || existing?.watchedByProgress) {
       viewedIds.add(videoId);
     } else {
       viewedIds.delete(videoId);
@@ -504,7 +520,7 @@
     }
 
     // Update watch page indicator with fresh state
-    updateWatchIndicator(state.liked, state.disliked);
+    updateWatchIndicator(state.liked, disliked);
     if (settings.enabled) scheduleCounterUpdate();
   }
 
@@ -653,10 +669,7 @@
     let anchor = null;
 
     if (isShorts) {
-      anchor =
-        document.querySelector('ytd-reel-video-renderer[is-active] #overlay') ||
-        document.querySelector('ytd-reel-video-renderer[is-active] .metadata-container') ||
-        document.querySelector('ytd-reel-video-renderer[is-active]');
+      anchor = YTParser.getShortsIndicatorAnchor();
     } else {
       anchor =
         document.querySelector('#above-the-fold') ||
@@ -710,10 +723,15 @@
       return;
     }
 
+    // Observe the action-bar container, not a single segmented button:
+    // yt-smartimation renders two `segmented-like-dislike-button-view-model`
+    // buffers side by side and swaps which one is visible, so watching only the
+    // first would miss the state change that lands in the other.
     const container =
+      document.querySelector('#top-level-buttons-computed') ||
+      document.querySelector('ytd-watch-metadata #actions') ||
       document.querySelector('ytd-segmented-like-dislike-button-renderer') ||
       document.querySelector('segmented-like-dislike-button-view-model') ||
-      document.querySelector('#top-level-buttons-computed') ||
       document.querySelector('ytd-menu-renderer');
 
     if (!container) return;
@@ -733,7 +751,8 @@
           const state = YTParser.detectLikeDislikeState();
           if (state !== null) await handleLikeDislikeState(state);
         }, 300);
-      }
+      },
+      { childList: true }
     );
   }
 

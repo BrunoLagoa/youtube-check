@@ -199,17 +199,33 @@ Use `icons/icon-128.png` (já incluído no projeto).
 
 ---
 
-## Passo 6 — Notas da versão (What's new — v1.5.0)
+## Passo 6 — Notas da versão (What's new — v1.5.1)
 
-Se a v1.4.2 já foi publicada, use apenas a nota da 1.5.0:
+Se a v1.5.0 já foi publicada, use apenas a nota da 1.5.1:
 
 **English**
 
 ```
-• New: "Show full video title" setting — displays the complete title on video cards, with no "…" cut-off and no hovering needed (Home, Search, Channels, Playlists, Shorts and suggested videos). Off by default
+• Fixed: Like/Dislike detection is reliable again on the watch page — YouTube changed its layout and the extension sometimes read the wrong button, leaving videos unmarked
+• Fixed: already-marked videos are no longer un-marked on their own by an incorrect reading
+• Fixed: liking a video now updates the badge immediately, with no page reload needed
+• Fixed: the "You already rated this video" indicator is back on Shorts
 ```
 
 **Português (Brasil)**
+
+```
+• Correção: o Like/Dislike voltou a ser detectado de forma confiável na página do vídeo — o YouTube mudou o layout e a extensão às vezes lia um botão errado, deixando de marcar o vídeo
+• Correção: vídeos já marcados não são mais desmarcados sozinhos por uma leitura incorreta
+• Correção: dar Like agora atualiza o selo na hora, sem precisar recarregar a página
+• Correção: o indicador "Você já avaliou este vídeo" voltou a aparecer nos Shorts
+```
+
+Caso publique acumulando desde a 1.4.2, some as notas da 1.5.0 abaixo:
+
+```
+• New: "Show full video title" setting — displays the complete title on video cards, with no "…" cut-off and no hovering needed (Home, Search, Channels, Playlists, Shorts and suggested videos). Off by default
+```
 
 ```
 • Novo: opção "Exibir título completo" — mostra o título inteiro dos vídeos nos cards, sem o corte em "…" e sem precisar passar o mouse (Home, Busca, Canal, Playlists, Shorts e recomendados). Desligada por padrão

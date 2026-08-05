@@ -2,6 +2,18 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.5.1] - 2026-08-05
+
+### Fixed
+
+- **Like/Dislike deixava de ser detectado na página do vídeo, de forma intermitente.** O YouTube passou a renderizar os botões de avaliação várias vezes na mesma página — na barra de ações, num overlay invisível dentro do player e em buffers de animação fora da tela. A extensão lia a primeira cópia que encontrasse, que costumava ser uma invisível e ainda sem o estado real, e concluía que o vídeo não tinha sido avaliado. Agora só botões efetivamente visíveis são considerados
+- **Vídeos já marcados podiam ser desmarcados sozinhos.** Como consequência do item acima, essa leitura prematura era gravada e apagava a marcação existente. A leitura agora fica pendente até haver um botão confiável, em vez de assumir "não avaliado"
+- **Dar Like não atualizava o selo sem recarregar a página.** O YouTube pode aplicar o novo estado substituindo um elemento inteiro, o que não gera mudança de atributo nenhuma — o monitoramento nunca era acionado. Passou a observar também a inserção/remoção de elementos na barra de ações
+- **Indicador "Você já avaliou este vídeo" nunca aparecia nos Shorts.** O YouTube removeu o atributo que identificava o Short em exibição e moveu a barra de ações para fora do corpo do reel; os três pontos de ancoragem do indicador deixaram de existir
+- Novos botões de avaliação do **resumo por IA** (que dizem "Gostei" mas avaliam o resumo, não o vídeo) não são mais confundidos com a avaliação do vídeo
+- O player de Shorts não expõe mais botão de Dislike; um Dislike registrado na página do vídeo não é mais apagado ao abrir o mesmo conteúdo como Short
+- Nome do canal e título extraídos dos cards voltaram a ser preenchidos — o YouTube renomeou as classes CSS dos componentes de listagem
+
 ## [1.5.0] - 2026-07-23
 
 ### Added

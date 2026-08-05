@@ -130,6 +130,14 @@ const YTParser = (() => {
     );
   }
 
+  /**
+   * The reel currently on screen.
+   *
+   * `is-active` is gone from the current Shorts DOM, so it is only the first of
+   * three layers — matching the URL's video ID and, failing that, the reel
+   * overlapping the viewport centre are what actually resolve today.
+   * @returns {Element|null}
+   */
   function getActiveShortsReel() {
     const byAttr =
       document.querySelector('ytd-reel-video-renderer[is-active]') ||
@@ -162,6 +170,35 @@ const YTParser = (() => {
     }
 
     return best;
+  }
+
+  /**
+   * Positioning parent for the Shorts "already rated" pill.
+   *
+   * The reel itself is the anchor of choice: it is `position: relative` and its
+   * box is exactly the video area, which is what the absolute placement in
+   * `.ytcheck-shorts-player-indicator` expects. The overlay renderer is wider
+   * (it includes the action-bar column), so it only serves as a fallback —
+   * as do the legacy `#overlay` / `.metadata-container` nodes, both of which
+   * YouTube has since dropped from the reel.
+   *
+   * @returns {Element|null}
+   */
+  function getShortsIndicatorAnchor() {
+    const reel = getActiveShortsReel();
+    if (reel) {
+      return (
+        reel.querySelector('#overlay') ||
+        reel.querySelector('.metadata-container') ||
+        reel
+      );
+    }
+
+    return (
+      document.querySelector('ytd-reel-player-overlay-renderer') ||
+      document.querySelector('yt-reel-player-overlay-view-model') ||
+      null
+    );
   }
 
   /**
@@ -217,9 +254,11 @@ const YTParser = (() => {
     const videoId = extractVideoId(href);
     if (!videoId) return null;
 
-    // Title — includes the current lockup layout (yt-lockup-view-model),
-    // whose title lives in a .yt-lockup-metadata-view-model__title anchor.
+    // Title — current lockup layout first (YouTube renamed the BEM classes to
+    // PascalCase: .yt-lockup-metadata-view-model__title → .ytLockupMetadataViewModelTitle),
+    // then the legacy ytd-* renderers.
     const titleEl =
+      el.querySelector('a.ytLockupMetadataViewModelTitle') ||
       el.querySelector('#video-title') ||
       el.querySelector('h3 a') ||
       el.querySelector('.title') ||
@@ -236,18 +275,11 @@ const YTParser = (() => {
          '').trim()
       : '';
 
-    // Channel name
-    const channelEl =
-      el.querySelector('ytd-channel-name yt-formatted-string') ||
-      el.querySelector('.ytd-channel-name') ||
-      el.querySelector('#channel-name') ||
-      el.querySelector('a.yt-simple-endpoint[href*="/@"]') ||
-      el.querySelector('a.yt-simple-endpoint[href*="/channel/"]');
-
-    const channel = channelEl ? channelEl.textContent.trim() : '';
+    const channel = _extractChannelName(el);
 
     // Thumbnail URL
     const thumbEl =
+      el.querySelector('img.ytCoreImageHost') ||
       el.querySelector('img.yt-core-image') ||
       el.querySelector(' ytd-thumbnail img') ||
       el.querySelector('img#img') ||
@@ -263,6 +295,35 @@ const YTParser = (() => {
     const url = `https://www.youtube.com/watch?v=${videoId}`;
 
     return { videoId, title, channel, thumbnail, url };
+  }
+
+  /**
+   * Channel name from a video card.
+   *
+   * The lockup layout dropped `ytd-channel-name`; its channel now sits in a
+   * `yt-content-metadata-view-model` row that also carries view count and age,
+   * so that node's text is unusable. The channel link is the reliable handle —
+   * but the avatar is a link too, hence the "must have text" filter.
+   *
+   * @param {Element} el
+   * @returns {string}
+   */
+  function _extractChannelName(el) {
+    const legacy =
+      el.querySelector('ytd-channel-name yt-formatted-string') ||
+      el.querySelector('.ytd-channel-name') ||
+      el.querySelector('#channel-name');
+    if (legacy) {
+      const text = legacy.textContent.trim();
+      if (text) return text;
+    }
+
+    for (const link of el.querySelectorAll('a[href^="/@"], a[href^="/channel/"], a.yt-simple-endpoint[href*="/@"]')) {
+      const text = link.textContent.trim();
+      if (text) return text;
+    }
+
+    return '';
   }
 
   /**
@@ -294,8 +355,12 @@ const YTParser = (() => {
       videoId = _extractVideoIdFromMedia(el);
     }
 
-    // Active reel may not expose href yet — fall back to URL
-    if (!videoId && el.hasAttribute('is-active')) {
+    // The reel on screen may not expose an href yet — fall back to the URL.
+    // `is-active` is gone from the current DOM, where the feed holds a single
+    // reel node, so that case stands in for it. (Deliberately not calling
+    // getActiveShortsReel here — it calls back into this function.)
+    const isTheOnlyReel = document.querySelectorAll('ytd-reel-video-renderer').length === 1;
+    if (!videoId && isShortsPlayer() && (el.hasAttribute('is-active') || isTheOnlyReel)) {
       videoId = getCurrentVideoId();
     }
 
@@ -347,6 +412,7 @@ const YTParser = (() => {
       : '';
 
     const thumbEl =
+      el.querySelector('img.ytCoreImageHost') ||
       el.querySelector('img.yt-core-image') ||
       el.querySelector('img');
 
@@ -370,17 +436,22 @@ const YTParser = (() => {
     const videoId = extractVideoId(window.location.href);
     if (!videoId) return null;
 
-    const titleEl =
-      document.querySelector('ytd-reel-video-renderer[is-active] h2') ||
-      document.querySelector('ytd-reel-video-renderer[is-active] #video-title') ||
-      document.querySelector('ytd-shorts h2');
+    // Scoped to the reel on screen — `[is-active]` no longer exists.
+    const reel = getActiveShortsReel();
+    const titleEl = reel
+      ? (reel.querySelector('h2') ||
+         reel.querySelector('#video-title') ||
+         reel.querySelector('yt-shorts-video-title-view-model'))
+      : document.querySelector('ytd-shorts h2');
 
     const title = titleEl ? titleEl.textContent.trim() : document.title.replace(' - YouTube', '').trim();
 
-    const channelEl =
-      document.querySelector('ytd-reel-video-renderer[is-active] ytd-channel-name') ||
-      document.querySelector('ytd-reel-video-renderer[is-active] #channel-name') ||
-      document.querySelector('ytd-shorts #channel-name');
+    const channelEl = reel
+      ? (reel.querySelector('ytd-channel-name') ||
+         reel.querySelector('#channel-name') ||
+         reel.querySelector('yt-reel-channel-bar-view-model') ||
+         reel.querySelector('a[href^="/@"]'))
+      : document.querySelector('ytd-shorts #channel-name');
     const channel = channelEl ? channelEl.textContent.trim() : '';
 
     return {
@@ -397,88 +468,55 @@ const YTParser = (() => {
   /**
    * Detect the current like/dislike state on a video watch page OR Shorts player.
    * Uses aria-pressed and aria-label attributes on the like/dislike buttons.
-   * @returns {{ liked: boolean, disliked: boolean }|null}
+   *
+   * Returns `null` — never a `{liked:false, disliked:false}` guess — while no
+   * trustworthy button is mounted yet. Callers persist whatever comes back, so a
+   * guess here would record the video as unrated and wipe an existing mark.
+   *
+   * `dislikeReadable` is false on layouts that expose no dislike control at all
+   * (the current Shorts player), so callers can leave the stored value alone.
+   *
+   * @returns {{ liked: boolean, disliked: boolean, dislikeReadable: boolean }|null}
    */
   function detectLikeDislikeState() {
-    // Shorts player has its own like/dislike DOM inside ytd-reel-video-renderer[is-active]
+    // Shorts player has its own like/dislike DOM inside the reel's action bar
     if (isShortsPlayer()) {
       return _detectShortsLikeState();
     }
 
     const likeButton = _findLikeButton();
-    const dislikeButton = _findDislikeButton();
+    if (!likeButton) return null;
 
-    if (!likeButton && !dislikeButton) return null;
+    const dislikeButton = _findDislikeButton();
 
     return {
       liked: _isButtonActive(likeButton),
       disliked: _isButtonActive(dislikeButton),
+      dislikeReadable: !!dislikeButton,
     };
   }
 
   /**
-   * Detect like/dislike within the active Shorts reel.
-   * The like/dislike actions are inside the active ytd-reel-video-renderer.
-   * @returns {{ liked: boolean, disliked: boolean }|null}
+   * Detect like/dislike for the Short currently playing. The action bar was
+   * lifted out of the reel body (`extract-action-bar`) into the player overlay,
+   * but both still live inside the reel element.
+   * @returns {{ liked: boolean, disliked: boolean, dislikeReadable: boolean }|null}
    */
   function _detectShortsLikeState() {
-    const root = getShortsRoot() || document;
+    const scope = getActiveShortsReel() || getShortsRoot() || document;
 
-    // YouTube 2024+: shared action bar (buttons are NOT inside each reel)
-    let likeBtn =
-      root.querySelector('like-button-view-model button[aria-label]') ||
-      root.querySelector('ytd-like-button-renderer button[aria-label]');
-    let dislikeBtn =
-      root.querySelector('dislike-button-view-model button[aria-label]') ||
-      root.querySelector('ytd-dislike-button-renderer button[aria-label]');
+    const likeBtn = _findRatingButton('like', scope) || _findRatingButton('like');
+    if (!likeBtn) return null;
 
-    // Fallback: visible like/dislike buttons in the Shorts UI
-    if (!likeBtn || !dislikeBtn) {
-      const visible = _findVisibleShortsButtons(root);
-      likeBtn = likeBtn || visible.like;
-      dislikeBtn = dislikeBtn || visible.dislike;
-    }
-
-    // Last resort: active reel scope
-    if (!likeBtn || !dislikeBtn) {
-      const reel = getActiveShortsReel();
-      if (reel) {
-        likeBtn = likeBtn || _findShortsButton(reel, ['like', 'gostei', 'curtir'], ['dislike', 'não gostei', 'não curtir']);
-        dislikeBtn = dislikeBtn || _findShortsButton(reel, ['dislike', 'não gostei', 'não curtir'], []);
-      }
-    }
-
-    if (!likeBtn && !dislikeBtn) return null;
+    // The current Shorts layout ships no dislike button at all — report that
+    // rather than letting a missing button read as "not disliked".
+    const dislikeBtn = _findRatingButton('dislike', scope) || _findRatingButton('dislike');
 
     return {
       liked: _isButtonActive(likeBtn),
       disliked: _isButtonActive(dislikeBtn),
+      dislikeReadable: !!dislikeBtn,
     };
-  }
-
-  function _findVisibleShortsButtons(root) {
-    let like = null;
-    let dislike = null;
-
-    for (const btn of root.querySelectorAll('button[aria-label], yt-button-shape button')) {
-      const rect = btn.getBoundingClientRect();
-      if (rect.width < 8 || rect.height < 8) continue;
-
-      const label = (btn.getAttribute('aria-label') || '').toLowerCase();
-      const isDislike =
-        label.includes('não gostei') ||
-        label.includes('dislike') ||
-        label.includes('não curtir');
-      const isLike =
-        !isDislike &&
-        (label.includes('gostei') || label.includes('like') || label.includes('curtir'));
-
-      if (isLike && !like) like = btn;
-      if (isDislike && !dislike) dislike = btn;
-      if (like && dislike) break;
-    }
-
-    return { like, dislike };
   }
 
   /**
@@ -509,87 +547,101 @@ const YTParser = (() => {
   }
 
   /**
-   * Find a button within a Shorts scope by aria-label keywords.
-   * @param {Element} scope
-   * @param {string[]} includeTerms
-   * @param {string[]} excludeTerms
-   * @returns {Element|null}
+   * Components that render their own like/dislike pair which must never be read
+   * as the video's rating. Today that's the AI summary card, whose buttons rate
+   * the summary, not the video — and whose aria-label still says "Gostei".
    */
-  function _findShortsButton(scope, includeTerms, excludeTerms) {
-    const buttons = scope.querySelectorAll(
-      'button[aria-label], yt-button-shape button, button.yt-spec-button-shape-next'
-    );
-    for (const btn of buttons) {
-      const label = (btn.getAttribute('aria-label') || '').toLowerCase();
-      const included = includeTerms.some((t) => label.includes(t));
-      const excluded = excludeTerms.some((t) => label.includes(t));
-      if (included && !excluded) return btn;
-    }
-    return null;
+  const RATING_DECOY_SELECTOR = 'video-summary-content-view-model';
+
+  /**
+   * A rating button is only trustworthy once it is actually laid out.
+   *
+   * YouTube renders the like/dislike pair several times over: the watch action
+   * bar, the player's quick-action overlay (`yt-player-quick-action-buttons`,
+   * sized 0×0 until fullscreen) and yt-smartimation's off-screen animation
+   * buffers. The hidden copies keep their initial `aria-pressed="false"`, so
+   * reading one of them reports a liked video as unrated. Requiring a non-zero
+   * box picks whichever copy is really on screen — including the quick-action
+   * one in fullscreen, where it *is* the control the user clicks.
+   *
+   * @param {Element|null} btn
+   * @returns {boolean}
+   */
+  function _isUsableRatingButton(btn) {
+    if (!btn || btn.closest(RATING_DECOY_SELECTOR)) return false;
+    const rect = btn.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0;
   }
 
-  function _findLikeButton() {
-    const modern =
-      document.querySelector('like-button-view-model button[aria-label]') ||
-      document.querySelector('ytd-segmented-like-dislike-button-renderer #like-button button');
-    if (modern) return modern;
+  /**
+   * Layered selectors per rating kind: the real watch action bar first, then any
+   * view-model instance, then the legacy Polymer renderers.
+   */
+  const RATING_SELECTORS = {
+    like: [
+      '#top-level-buttons-computed like-button-view-model button[aria-label]',
+      'ytd-watch-metadata like-button-view-model button[aria-label]',
+      'segmented-like-dislike-button-view-model like-button-view-model button[aria-label]',
+      'like-button-view-model button[aria-label]',
+      'ytd-segmented-like-dislike-button-renderer #like-button button',
+    ],
+    dislike: [
+      '#top-level-buttons-computed dislike-button-view-model button[aria-label]',
+      'ytd-watch-metadata dislike-button-view-model button[aria-label]',
+      'segmented-like-dislike-button-view-model dislike-button-view-model button[aria-label]',
+      'dislike-button-view-model button[aria-label]',
+      'ytd-segmented-like-dislike-button-renderer #dislike-button button',
+    ],
+  };
 
-    // YouTube uses aria-label containing "Gostei", "Like", etc.
-    const candidates = document.querySelectorAll(
-      'button[aria-label], ytd-toggle-button-renderer button, yt-button-shape button'
-    );
+  /** aria-label keywords (pt-BR + en) for the last-resort layer. */
+  const RATING_KEYWORDS = {
+    like: {
+      include: ['gostei', 'like', 'curtir'],
+      exclude: ['não gostei', 'nao gostei', 'dislike', 'não curtir', 'nao curtir', 'resumo', 'summary'],
+    },
+    dislike: {
+      include: ['não gostei', 'nao gostei', 'dislike', 'não curtir', 'nao curtir'],
+      exclude: ['resumo', 'summary'],
+    },
+  };
 
-    for (const btn of candidates) {
-      const label = (btn.getAttribute('aria-label') || '').toLowerCase();
-      if (
-        label.includes('gostei') ||
-        label.includes('like') ||
-        label.includes('curtir')
-      ) {
-        // Exclude dislike buttons
-        if (
-          !label.includes('não gostei') &&
-          !label.includes('dislike') &&
-          !label.includes('não curtir')
-        ) {
-          return btn;
-        }
+  /**
+   * Find the on-screen like or dislike button.
+   * @param {'like'|'dislike'} kind
+   * @param {Element|Document} [scope]
+   * @returns {Element|null}
+   */
+  function _findRatingButton(kind, scope = document) {
+    for (const selector of RATING_SELECTORS[kind]) {
+      for (const btn of scope.querySelectorAll(selector)) {
+        if (_isUsableRatingButton(btn)) return btn;
       }
     }
 
-    // Fallback: find within like/dislike segmented button
-    return (
-      document.querySelector('ytd-segmented-like-dislike-button-renderer #like-button button') ||
-      document.querySelector('ytd-toggle-button-renderer:first-of-type button') ||
-      null
-    );
-  }
-
-  function _findDislikeButton() {
-    const modern =
-      document.querySelector('dislike-button-view-model button[aria-label]') ||
-      document.querySelector('ytd-segmented-like-dislike-button-renderer #dislike-button button');
-    if (modern) return modern;
-
-    const candidates = document.querySelectorAll(
+    // Last layer: match by aria-label, for layouts we haven't seen yet.
+    const { include, exclude } = RATING_KEYWORDS[kind];
+    const candidates = scope.querySelectorAll(
       'button[aria-label], ytd-toggle-button-renderer button, yt-button-shape button'
     );
 
     for (const btn of candidates) {
+      if (!_isUsableRatingButton(btn)) continue;
       const label = (btn.getAttribute('aria-label') || '').toLowerCase();
-      if (
-        label.includes('não gostei') ||
-        label.includes('dislike') ||
-        label.includes('não curtir')
-      ) {
+      if (include.some((t) => label.includes(t)) && !exclude.some((t) => label.includes(t))) {
         return btn;
       }
     }
 
-    return (
-      document.querySelector('ytd-segmented-like-dislike-button-renderer #dislike-button button') ||
-      null
-    );
+    return null;
+  }
+
+  function _findLikeButton() {
+    return _findRatingButton('like');
+  }
+
+  function _findDislikeButton() {
+    return _findRatingButton('dislike');
   }
 
   /**
@@ -654,7 +706,8 @@ const YTParser = (() => {
       el.querySelector('a#thumbnail') ||
       el.querySelector('.ytd-thumbnail') ||
       el.querySelector('yt-thumbnail-view-model') ||             // current lockup layout
-      el.querySelector('.yt-lockup-view-model-wiz__content-image') ||
+      el.querySelector('.ytLockupViewModelContentImage') ||      // current lockup naming
+      el.querySelector('.yt-lockup-view-model-wiz__content-image') || // previous lockup naming
       el.querySelector('yt-image') ||
       el
     );
@@ -671,6 +724,7 @@ const YTParser = (() => {
     isShortsShelf,
     getActiveShortsReel,
     getShortsRoot,
+    getShortsIndicatorAnchor,
     getCurrentShortsVideoId,
     getActiveVideoElement,
     getShortsRatingClickType,

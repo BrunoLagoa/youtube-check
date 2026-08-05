@@ -124,15 +124,25 @@ const YTDomObserver = (() => {
 
   /**
    * Observe attribute changes on a specific element (for like/dislike toggle).
+   *
+   * `options.childList` additionally fires the callback when nodes are added or
+   * removed in the subtree. The watch page needs it: yt-smartimation can swap
+   * the like/dislike state in by *replacing* a buffer node, which produces no
+   * attribute mutation at all. It's opt-in because on a busy subtree (the Shorts
+   * feed) it would fire on every scroll.
+   *
    * @param {Element} el
    * @param {string[]} attributes
    * @param {function(): void} callback
+   * @param {{ childList?: boolean }} [options]
    * @returns {MutationObserver}
    */
-  function observeAttributes(el, attributes, callback) {
+  function observeAttributes(el, attributes, callback, options = {}) {
+    const watchChildList = !!options.childList;
+
     const attrObserver = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
-        if (attributes.includes(mutation.attributeName)) {
+        if (mutation.type === 'childList' || attributes.includes(mutation.attributeName)) {
           callback();
           break;
         }
@@ -142,6 +152,7 @@ const YTDomObserver = (() => {
     attrObserver.observe(el, {
       attributes: true,
       attributeFilter: attributes,
+      childList: watchChildList,
       subtree: true,
     });
 

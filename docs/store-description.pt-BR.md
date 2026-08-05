@@ -1,5 +1,5 @@
 Listagem da Chrome Web Store — PORTUGUÊS (BRASIL). Copie cada bloco abaixo (o texto sob a linha [ RÓTULO ]) direto no campo correspondente do dashboard.
-Manter em sincronia com store-description.en.md. Versão atual: 1.5.0
+Manter em sincronia com store-description.en.md. Versão atual: 1.5.1
 
 [ NOME ]
 
@@ -39,6 +39,9 @@ Privacidade
 
 Ideal para quem assiste muito YouTube e quer saber rapidamente o que já passou pelo feed.
 
-[ NOVIDADES — versão 1.5.0 ]
+[ NOVIDADES — versão 1.5.1 ]
 
-• Novo: opção "Exibir título completo" — mostra o título inteiro dos vídeos nos cards, sem o corte em "…" e sem precisar passar o mouse (Home, Busca, Canal, Playlists, Shorts e recomendados). Desligada por padrão
+• Correção: o Like/Dislike voltou a ser detectado de forma confiável na página do vídeo — o YouTube mudou o layout e a extensão às vezes lia um botão errado, deixando de marcar o vídeo
+• Correção: vídeos já marcados não são mais desmarcados sozinhos por uma leitura incorreta
+• Correção: dar Like agora atualiza o selo na hora, sem precisar recarregar a página
+• Correção: o indicador "Você já avaliou este vídeo" voltou a aparecer nos Shorts
