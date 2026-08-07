@@ -162,6 +162,40 @@ yt-thumbnail-view-model:hover .ytcheck-badge {
   transition: transform 0.15s ease;
 }
 
+/* ─── PLAYLIST PANEL (watch page queue) ────────────────────────────────────────
+ * Its thumbnails are 100×56 — a third of a regular card — so the standard badge
+ * would swallow the frame. Shrink it, and in overlay mode drop the label so only
+ * the ✓ remains: at this size the text is unreadable anyway.
+ */
+ytd-playlist-panel-video-renderer .ytcheck-badge {
+  top: 4px;
+  right: 4px;
+  padding: 1px 5px;
+  font-size: 9px;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+ytd-playlist-panel-video-renderer .ytcheck-overlay-label {
+  padding: 0;
+  gap: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  /* Collapses the configured text without removing it from the DOM — the ✓
+   * pseudo-element below stands in for it at this size. */
+  font-size: 0;
+}
+
+ytd-playlist-panel-video-renderer .ytcheck-overlay-label::before {
+  content: '✓';
+  font-size: 12px;
+  font-weight: 900;
+  color: #fff;
+}
+
 /* ─── VIEWED CARD TINT ─────────────────────────────────────────────────────────── */
 [data-ytcheck-viewed="true"] ytd-thumbnail::after,
 [data-ytcheck-viewed="true"] a#thumbnail::after,

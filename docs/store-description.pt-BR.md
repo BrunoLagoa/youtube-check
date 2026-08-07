@@ -1,5 +1,5 @@
 Listagem da Chrome Web Store — PORTUGUÊS (BRASIL). Copie cada bloco abaixo (o texto sob a linha [ RÓTULO ]) direto no campo correspondente do dashboard.
-Manter em sincronia com store-description.en.md. Versão atual: 1.5.1
+Manter em sincronia com store-description.en.md. Versão atual: 1.6.0
 
 [ NOME ]
 
@@ -16,7 +16,7 @@ YouTube Check ajuda você a não perder tempo com vídeos que já avaliou.
 Como funciona
 • Abra um vídeo no YouTube e dê Like ou Dislike
 • A extensão salva a avaliação localmente no seu navegador
-• Ao navegar (Home, Busca, Canal, Playlists, Shorts e a lista de recomendados ao lado do vídeo), vídeos já avaliados aparecem com o badge "✓ Visualizado"
+• Ao navegar (Home, Busca, Canal, Playlists, Shorts, a lista de recomendados e a playlist ao lado do vídeo), vídeos já avaliados aparecem com o badge "✓ Visualizado"
 
 Recursos
 ✓ Detecção automática de Like e Dislike
@@ -24,7 +24,7 @@ Recursos
 ✓ Badge ou overlay configurável nas thumbnails
 ✓ Opcional: exibir o título completo dos vídeos nos cards, sem o corte em "…"
 ✓ Suporte completo a YouTube Shorts
-✓ Contador flutuante de vídeos vistos na página — dispensável por página e arrastável para qualquer posição (clique duplo restaura o canto)
+✓ Contador flutuante de vídeos vistos na página — mostra o progresso da playlist quando você está acompanhando uma lista; dispensável por página e arrastável para qualquer posição (clique duplo restaura o canto)
 ✓ Indicador na página do vídeo ("Você já avaliou este vídeo")
 ✓ Popup com estatísticas e histórico recente — remova itens individuais ou limpe tudo
 ✓ Limpeza automática do histórico (para sempre, ou 30 / 90 / 180 / 365 dias)
@@ -39,9 +39,7 @@ Privacidade
 
 Ideal para quem assiste muito YouTube e quer saber rapidamente o que já passou pelo feed.
 
-[ NOVIDADES — versão 1.5.1 ]
+[ NOVIDADES — versão 1.6.0 ]
 
-• Correção: o Like/Dislike voltou a ser detectado de forma confiável na página do vídeo — o YouTube mudou o layout e a extensão às vezes lia um botão errado, deixando de marcar o vídeo
-• Correção: vídeos já marcados não são mais desmarcados sozinhos por uma leitura incorreta
-• Correção: dar Like agora atualiza o selo na hora, sem precisar recarregar a página
-• Correção: o indicador "Você já avaliou este vídeo" voltou a aparecer nos Shorts
+• Novo: o badge "✓ Visualizado" agora aparece também na lista de vídeos ao lado do player — a playlist que você está acompanhando, a fila de reprodução automática e os Mixes
+• Novo: o contador flutuante mostra o progresso da playlist (ex.: 11/47) enquanto você assiste a uma lista, em vez de misturar a fila com os vídeos recomendados

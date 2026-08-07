@@ -1212,6 +1212,10 @@
 
     let total = 0;
     let viewed = 0;
+    // Watching a playlist: the counter reports progress through the playlist,
+    // not through the whole page — otherwise the queue and the unrelated
+    // recommendations beside it would add up into one meaningless total.
+    let inPlaylist = false;
 
     // Shorts: count all videos seen while scrolling this feed
     if (YTParser.isShortsPlayer()) {
@@ -1224,7 +1228,12 @@
         return;
       }
     } else {
-      const allCards = document.querySelectorAll(YTParser.VIDEO_ELEMENTS_SELECTOR);
+      const panelItems = YTParser.getPlaylistPanelItems();
+      inPlaylist = panelItems.length > 0;
+
+      const allCards = inPlaylist
+        ? panelItems
+        : document.querySelectorAll(YTParser.VIDEO_ELEMENTS_SELECTOR);
       if (allCards.length === 0) {
         removePageCounter();
         return;
@@ -1270,7 +1279,7 @@
         <span class="ytcheck-counter-check">✓</span>
         <div class="ytcheck-counter-text">
           <span class="ytcheck-counter-nums">${viewed}<span class="ytcheck-counter-sep">/</span>${total}</span>
-          <span class="ytcheck-counter-label">${YTCheckI18n.t('viewedOnPage')}</span>
+          <span class="ytcheck-counter-label">${YTCheckI18n.t(inPlaylist ? 'viewedInPlaylist' : 'viewedOnPage')}</span>
         </div>
         <div class="ytcheck-counter-ring" style="--pct:${pct}">
           <svg viewBox="0 0 36 36">

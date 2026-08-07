@@ -73,7 +73,7 @@ YouTube Check ajuda você a não perder tempo com vídeos que já avaliou.
 Como funciona
 • Abra um vídeo no YouTube e dê Like ou Dislike
 • A extensão salva a avaliação localmente no seu navegador
-• Ao navegar (Home, Busca, Canal, Playlists, Shorts e a lista de recomendados ao lado do vídeo), vídeos já avaliados aparecem com o badge "✓ Visualizado"
+• Ao navegar (Home, Busca, Canal, Playlists, Shorts, a lista de recomendados e a playlist ao lado do vídeo), vídeos já avaliados aparecem com o badge "✓ Visualizado"
 
 Recursos
 ✓ Detecção automática de Like e Dislike
@@ -81,7 +81,7 @@ Recursos
 ✓ Badge ou overlay configurável nas thumbnails
 ✓ Opcional: exibir o título completo dos vídeos nos cards, sem o corte em "…"
 ✓ Suporte completo a YouTube Shorts
-✓ Contador flutuante de vídeos vistos na página — dispensável por página e arrastável para qualquer posição (clique duplo restaura o canto)
+✓ Contador flutuante de vídeos vistos na página — mostra o progresso da playlist quando você está acompanhando uma lista; dispensável por página e arrastável para qualquer posição (clique duplo restaura o canto)
 ✓ Indicador na página do vídeo ("Você já avaliou este vídeo")
 ✓ Popup com estatísticas e histórico recente — remova itens individuais ou limpe tudo
 ✓ Limpeza automática do histórico (para sempre, ou 30 / 90 / 180 / 365 dias)
@@ -105,7 +105,7 @@ YouTube Check helps you avoid re-watching videos you've already rated on YouTube
 HOW IT WORKS
 • Open any YouTube video and give it a Like or Dislike
 • The extension saves your rating locally in your browser
-• While browsing Home, Search, Channels, Playlists, Shorts, and the suggested videos list beside the video you're watching, rated videos show a "✓ Viewed" badge on thumbnails
+• While browsing Home, Search, Channels, Playlists, Shorts, and both the suggested videos and the playlist queue beside the video you're watching, rated videos show a "✓ Viewed" badge on thumbnails
 
 FEATURES
 ✓ Automatic Like/Dislike detection
@@ -113,7 +113,7 @@ FEATURES
 ✓ Configurable badge or overlay on thumbnails
 ✓ Optional: show the full video title on cards, with no "…" cut-off
 ✓ Full YouTube Shorts support
-✓ Floating page counter (viewed/total on the current listing) — dismissible per page and draggable to any position (double-click to reset)
+✓ Floating page counter (viewed/total on the current listing) — reports your progress through a playlist while you watch one; dismissible per page and draggable to any position (double-click to reset)
 ✓ Watch page indicator ("You already rated this video")
 ✓ Popup with statistics and recent history — remove individual videos or clear everything
 ✓ Automatic history cleanup (keep forever, or 30 / 90 / 180 / 365 days)
@@ -199,11 +199,25 @@ Use `icons/icon-128.png` (já incluído no projeto).
 
 ---
 
-## Passo 6 — Notas da versão (What's new — v1.5.1)
+## Passo 6 — Notas da versão (What's new — v1.6.0)
 
-Se a v1.5.0 já foi publicada, use apenas a nota da 1.5.1:
+Se a v1.5.1 já foi publicada, use apenas a nota da 1.6.0:
 
 **English**
+
+```
+• New: the "✓ Viewed" badge now also shows in the video list beside the player — the playlist you're following, the autoplay queue and Mixes
+• New: the floating counter reports your progress through the playlist (e.g. 11/47) while you watch one, instead of mixing the queue in with the suggested videos
+```
+
+**Português (Brasil)**
+
+```
+• Novo: o badge "✓ Visualizado" agora aparece também na lista de vídeos ao lado do player — a playlist que você está acompanhando, a fila de reprodução automática e os Mixes
+• Novo: o contador flutuante mostra o progresso da playlist (ex.: 11/47) enquanto você assiste a uma lista, em vez de misturar a fila com os vídeos recomendados
+```
+
+Caso publique acumulando desde a 1.5.0, some as notas da 1.5.1 abaixo:
 
 ```
 • Fixed: Like/Dislike detection is reliable again on the watch page — YouTube changed its layout and the extension sometimes read the wrong button, leaving videos unmarked
@@ -211,8 +225,6 @@ Se a v1.5.0 já foi publicada, use apenas a nota da 1.5.1:
 • Fixed: liking a video now updates the badge immediately, with no page reload needed
 • Fixed: the "You already rated this video" indicator is back on Shorts
 ```
-
-**Português (Brasil)**
 
 ```
 • Correção: o Like/Dislike voltou a ser detectado de forma confiável na página do vídeo — o YouTube mudou o layout e a extensão às vezes lia um botão errado, deixando de marcar o vídeo

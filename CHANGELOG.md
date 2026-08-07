@@ -2,6 +2,17 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.6.0] - 2026-08-07
+
+### Added
+
+- Badge "Visualizado" agora também aparece na **lista de vídeos ao lado do player** — a playlist que você está acompanhando (`/watch?v=…&list=…`), a fila de reprodução automática e os Mixes. Esses itens usam um componente próprio do YouTube (`ytd-playlist-panel-video-renderer`) que nunca era detectado; a página da playlist em si (`/playlist?list=…`) já funcionava
+- Na miniatura reduzida dessa lista (100×56), o selo é exibido em versão compacta; no modo overlay ele vira apenas um ✓, já que o texto seria ilegível nesse tamanho
+
+### Changed
+
+- Contador flutuante passa a mostrar o **progresso da playlist** (ex.: 11/47, com o rótulo "vistos nesta playlist") quando há uma lista ao lado do player, em vez de somar a fila com os vídeos recomendados num total único
+
 ## [1.5.1] - 2026-08-05
 
 ### Fixed

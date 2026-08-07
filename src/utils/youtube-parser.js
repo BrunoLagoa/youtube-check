@@ -97,7 +97,8 @@ const YTParser = (() => {
     'ytd-compact-video-renderer',      // Compact sidebar (watch page, legacy layout)
     'yt-lockup-view-model',            // Watch page sidebar "up next" (current layout)
     'ytd-grid-video-renderer',         // Channel / Playlist grid
-    'ytd-playlist-video-renderer',     // Playlist list view
+    'ytd-playlist-video-renderer',     // Playlist list view (legacy; /playlist now ships lockups)
+    'ytd-playlist-panel-video-renderer', // Playlist panel on the watch page, autoplay queue & Mix
     'ytd-reel-item-renderer',          // Shorts shelf items (home page shelf)
     'ytd-reel-video-renderer',         // Shorts player feed items
     'ytd-rich-grid-media',             // Home (inner)
@@ -114,6 +115,21 @@ const YTParser = (() => {
    * Each reel video is a separate `ytd-reel-video-renderer`.
    */
   const SHORTS_PLAYER_SELECTOR = 'ytd-reel-video-renderer';
+
+  /**
+   * The playlist queue rendered beside the player on `/watch?list=...`.
+   * Kept separate from the generic card selector so the page counter can scope
+   * itself to the playlist instead of mixing it with the recommendations.
+   */
+  const PLAYLIST_PANEL_SELECTOR = 'ytd-playlist-panel-video-renderer';
+
+  /**
+   * The playlist queue items on the current page, if any.
+   * @returns {NodeListOf<Element>}
+   */
+  function getPlaylistPanelItems() {
+    return document.querySelectorAll(PLAYLIST_PANEL_SELECTOR);
+  }
 
   // ─── DATA EXTRACTION FROM ELEMENTS ──────────────────────────────────────────
 
@@ -321,6 +337,14 @@ const YTParser = (() => {
     for (const link of el.querySelectorAll('a[href^="/@"], a[href^="/channel/"], a.yt-simple-endpoint[href*="/@"]')) {
       const text = link.textContent.trim();
       if (text) return text;
+    }
+
+    // Playlist panel items expose no channel link at all — their `#byline` is
+    // the channel name on its own (unlike the other renderers, where the same
+    // id also carries view count and age).
+    if (el.matches?.(PLAYLIST_PANEL_SELECTOR)) {
+      const byline = el.querySelector('#byline');
+      if (byline) return byline.textContent.trim();
     }
 
     return '';
@@ -731,6 +755,8 @@ const YTParser = (() => {
     VIDEO_ELEMENTS_SELECTOR,
     VIDEO_ELEMENT_TAGS,
     SHORTS_PLAYER_SELECTOR,
+    PLAYLIST_PANEL_SELECTOR,
+    getPlaylistPanelItems,
     extractFromElement,
     extractFromShortsPlayer,
     detectLikeDislikeState,

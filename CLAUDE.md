@@ -51,7 +51,7 @@ Every storage op is wrapped in `safeStorage`, which no-ops with a fallback when 
 
 `content.js` is the orchestrator and handles three distinct YouTube contexts, dispatched from `_executePageChange`:
 
-1. **Listing pages** (Home, Search, sidebar, etc.): `YTDomObserver.start` runs a debounced `MutationObserver` matching `YTParser.VIDEO_ELEMENTS_SELECTOR`; matched cards get a badge if their `videoId` is in the viewed set. A floating, draggable **page counter** tallies viewed/total.
+1. **Listing pages** (Home, Search, sidebar, etc.): `YTDomObserver.start` runs a debounced `MutationObserver` matching `YTParser.VIDEO_ELEMENTS_SELECTOR`; matched cards get a badge if their `videoId` is in the viewed set. A floating, draggable **page counter** tallies viewed/total. When the page carries a playlist queue (`YTParser.PLAYLIST_PANEL_SELECTOR` matches — `/watch?list=…`, autoplay queue, Mix), the counter scopes itself to those items only and switches its label to `viewedInPlaylist`, so it reads as playlist progress instead of lumping the queue in with the recommendations beside it.
 2. **Watch page** (`/watch`): reads the like/dislike button state (retry loop + attribute observer) and persists it; optional **watch-progress tracking** listens to the `<video>` `timeupdate` and marks viewed past a threshold (opt-in, `settings.trackWatchProgress`). Injects the "you already rated this" indicator pill.
 3. **Shorts player** (`/shorts/ID`): its own monitoring stack — URL polling, click capture, per-reel attribute observers, and a bootstrap retry loop for hard reloads. The whole scroll session counts as one "page" for the counter.
 
