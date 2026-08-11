@@ -120,16 +120,25 @@ const YTCheckStorage = (() => {
         const watchedByProgress = videoData.watchedByProgress !== undefined
           ? videoData.watchedByProgress
           : !!existing.watchedByProgress;
+        const viewed = !!(liked || disliked || watchedByProgress);
 
-        videos[videoId] = {
+        const record = {
           ...existing,
           ...videoData,
           liked,
           disliked,
           watchedByProgress,
-          viewed: !!(liked || disliked || watchedByProgress),
+          viewed,
           updatedAt: Date.now(),
+          // Stamped once, when the record first becomes viewed — this is what the
+          // period counters (today / week / month) read. `updatedAt` can't serve
+          // that role: removing a like months later would move the video into
+          // today's tally. Un-viewing clears it so a later re-rating re-stamps.
+          viewedAt: viewed ? (existing.viewedAt || Date.now()) : undefined,
         };
+        if (!viewed) delete record.viewedAt;
+
+        videos[videoId] = record;
         chrome.storage.local.set({ videos }, resolve);
       });
     });
@@ -263,16 +272,24 @@ const YTCheckStorage = (() => {
 
           const existing = videos[id] || {};
           const merged = { ...existing, ...data };
+          // Same derivation as saveVideo — never trust an incoming `viewed`.
+          const viewed = !!(merged.liked || merged.disliked || merged.watchedByProgress);
+          // Without a timestamp the record would look infinitely old and be
+          // wiped by the first retention prune.
+          const updatedAt = merged.updatedAt || Date.now();
 
-          videos[id] = {
+          const record = {
             ...merged,
             videoId: merged.videoId || id,
-            // Same derivation as saveVideo — never trust an incoming `viewed`.
-            viewed: !!(merged.liked || merged.disliked || merged.watchedByProgress),
-            // Without a timestamp the record would look infinitely old and be
-            // wiped by the first retention prune.
-            updatedAt: merged.updatedAt || Date.now(),
+            viewed,
+            updatedAt,
+            // Backups written before viewedAt existed fall back to updatedAt, so
+            // imported history still lands in the period counters.
+            viewedAt: viewed ? (merged.viewedAt || updatedAt) : undefined,
           };
+          if (!viewed) delete record.viewedAt;
+
+          videos[id] = record;
           imported++;
         }
         chrome.storage.local.set({ videos }, () => {
@@ -283,17 +300,53 @@ const YTCheckStorage = (() => {
   }
 
   /**
-   * Get statistics summary.
-   * @returns {Promise<{total: number, liked: number, disliked: number, viewed: number}>}
+   * Calendar boundaries for the period counters, in local time: start of today,
+   * of the current week (Monday) and of the current month.
+   * @param {Date} [now]
+   * @returns {{day: number, week: number, month: number}}
+   */
+  function getPeriodStarts(now = new Date()) {
+    const day = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    // getDay() is 0 for Sunday — treat it as the 7th day so the week starts Monday.
+    const weekday = day.getDay() || 7;
+    const week = new Date(day);
+    week.setDate(day.getDate() - (weekday - 1));
+    const month = new Date(now.getFullYear(), now.getMonth(), 1);
+    return { day: day.getTime(), week: week.getTime(), month: month.getTime() };
+  }
+
+  /**
+   * Get statistics summary. The period counts only include viewed videos, dated
+   * by `viewedAt` — records saved before that field existed fall back to
+   * `updatedAt`, which is the closest approximation available for them.
+   * @returns {Promise<{total: number, liked: number, disliked: number, viewed: number,
+   *   viewedToday: number, viewedThisWeek: number, viewedThisMonth: number}>}
    */
   async function getStats() {
     const videos = await getAllVideos();
     const entries = Object.values(videos);
+    const starts = getPeriodStarts();
+
+    let viewedToday = 0;
+    let viewedThisWeek = 0;
+    let viewedThisMonth = 0;
+
+    for (const v of entries) {
+      if (!v.viewed) continue;
+      const at = v.viewedAt || v.updatedAt || 0;
+      if (at >= starts.day) viewedToday++;
+      if (at >= starts.week) viewedThisWeek++;
+      if (at >= starts.month) viewedThisMonth++;
+    }
+
     return {
       total: entries.length,
       liked: entries.filter((v) => v.liked).length,
       disliked: entries.filter((v) => v.disliked).length,
       viewed: entries.filter((v) => v.viewed).length,
+      viewedToday,
+      viewedThisWeek,
+      viewedThisMonth,
     };
   }
 

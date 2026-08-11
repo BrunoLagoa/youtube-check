@@ -2,6 +2,13 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.7.0] - 2026-08-11
+
+### Added
+
+- **Contadores por período no popup**: uma faixa com *Hoje*, *Esta semana* e *Este mês* mostra quantos vídeos passaram a contar como visualizados em cada janela de calendário (dia a partir das 00:00, semana a partir da segunda-feira, mês a partir do dia 1)
+- Cada registro agora guarda `viewedAt`, a data em que o vídeo passou a ser considerado visualizado. É esse campo que alimenta os contadores por período — usar `updatedAt` jogaria um vídeo antigo para "hoje" só por você ter removido o like dele. Registros salvos antes desta versão usam `updatedAt` como aproximação
+
 ## [1.6.0] - 2026-08-07
 
 ### Added

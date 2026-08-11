@@ -42,7 +42,7 @@ Each earlier file must define its global before a later one uses it: `YTCheckMes
 
 All persistence goes through `YTCheckStorage` (`src/storage/storage.js`), which wraps two Chrome storage areas:
 
-- **`chrome.storage.local` → `videos`**: a `{ videoId: record }` map. A record has `{ liked, disliked, watchedByProgress, title, channel, thumbnail, url, updatedAt, viewed }`. **`viewed` is always derived**: `liked || disliked || watchedByProgress`. `saveVideo` recomputes it on every write — never set `viewed` directly.
+- **`chrome.storage.local` → `videos`**: a `{ videoId: record }` map. A record has `{ liked, disliked, watchedByProgress, title, channel, thumbnail, url, updatedAt, viewedAt, viewed }`. **`viewed` is always derived**: `liked || disliked || watchedByProgress`. `saveVideo` recomputes it on every write — never set `viewed` directly. **`viewedAt` is stamped once**, when the record first becomes viewed, and deleted when it stops being viewed; `updatedAt` moves on every write, so only `viewedAt` can date the popup's today/week/month counters (`getStats`). Records written before 1.7.0 have no `viewedAt` — every reader must fall back to `updatedAt`.
 - **`chrome.storage.sync` → `settings`**: user preferences, merged over `DEFAULT_SETTINGS` and repaired by `normalizeSettings` on read (locale-aware badge text, clamped `watchProgressThreshold`).
 
 Every storage op is wrapped in `safeStorage`, which no-ops with a fallback when the extension context is invalidated (reload during an async call). The same `isContextAlive()` guard pattern recurs in `content.js`.

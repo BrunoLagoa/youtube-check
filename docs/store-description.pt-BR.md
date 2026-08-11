@@ -1,5 +1,5 @@
 Listagem da Chrome Web Store — PORTUGUÊS (BRASIL). Copie cada bloco abaixo (o texto sob a linha [ RÓTULO ]) direto no campo correspondente do dashboard.
-Manter em sincronia com store-description.en.md. Versão atual: 1.6.0
+Manter em sincronia com store-description.en.md. Versão atual: 1.7.0
 
 [ NOME ]
 
@@ -26,7 +26,7 @@ Recursos
 ✓ Suporte completo a YouTube Shorts
 ✓ Contador flutuante de vídeos vistos na página — mostra o progresso da playlist quando você está acompanhando uma lista; dispensável por página e arrastável para qualquer posição (clique duplo restaura o canto)
 ✓ Indicador na página do vídeo ("Você já avaliou este vídeo")
-✓ Popup com estatísticas e histórico recente — remova itens individuais ou limpe tudo
+✓ Popup com estatísticas e histórico recente — inclui quantos vídeos você visualizou hoje, nesta semana e neste mês; remova itens individuais ou limpe tudo
 ✓ Limpeza automática do histórico (para sempre, ou 30 / 90 / 180 / 365 dias)
 ✓ Exportar e importar dados (JSON)
 ✓ Configurações sincronizadas entre dispositivos (Chrome Sync)
@@ -39,7 +39,6 @@ Privacidade
 
 Ideal para quem assiste muito YouTube e quer saber rapidamente o que já passou pelo feed.
 
-[ NOVIDADES — versão 1.6.0 ]
+[ NOVIDADES — versão 1.7.0 ]
 
-• Novo: o badge "✓ Visualizado" agora aparece também na lista de vídeos ao lado do player — a playlist que você está acompanhando, a fila de reprodução automática e os Mixes
-• Novo: o contador flutuante mostra o progresso da playlist (ex.: 11/47) enquanto você assiste a uma lista, em vez de misturar a fila com os vídeos recomendados
+• Novo: o popup mostra quantos vídeos você visualizou hoje, nesta semana e neste mês, logo abaixo das estatísticas

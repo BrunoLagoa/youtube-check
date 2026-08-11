@@ -83,7 +83,7 @@ Recursos
 ✓ Suporte completo a YouTube Shorts
 ✓ Contador flutuante de vídeos vistos na página — mostra o progresso da playlist quando você está acompanhando uma lista; dispensável por página e arrastável para qualquer posição (clique duplo restaura o canto)
 ✓ Indicador na página do vídeo ("Você já avaliou este vídeo")
-✓ Popup com estatísticas e histórico recente — remova itens individuais ou limpe tudo
+✓ Popup com estatísticas e histórico recente — inclui quantos vídeos você visualizou hoje, nesta semana e neste mês; remova itens individuais ou limpe tudo
 ✓ Limpeza automática do histórico (para sempre, ou 30 / 90 / 180 / 365 dias)
 ✓ Exportar e importar dados (JSON)
 ✓ Configurações sincronizadas entre dispositivos (Chrome Sync)
@@ -115,7 +115,7 @@ FEATURES
 ✓ Full YouTube Shorts support
 ✓ Floating page counter (viewed/total on the current listing) — reports your progress through a playlist while you watch one; dismissible per page and draggable to any position (double-click to reset)
 ✓ Watch page indicator ("You already rated this video")
-✓ Popup with statistics and recent history — remove individual videos or clear everything
+✓ Popup with statistics and recent history — including how many videos you've viewed today, this week and this month; remove individual videos or clear everything
 ✓ Automatic history cleanup (keep forever, or 30 / 90 / 180 / 365 days)
 ✓ Export and import your data (JSON)
 ✓ Settings synced across devices via Chrome Sync
@@ -199,9 +199,23 @@ Use `icons/icon-128.png` (já incluído no projeto).
 
 ---
 
-## Passo 6 — Notas da versão (What's new — v1.6.0)
+## Passo 6 — Notas da versão (What's new — v1.7.0)
 
-Se a v1.5.1 já foi publicada, use apenas a nota da 1.6.0:
+Se a v1.6.0 já foi publicada, use apenas a nota da 1.7.0:
+
+**English**
+
+```
+• New: the popup now shows how many videos you've viewed today, this week and this month, right below the statistics
+```
+
+**Português (Brasil)**
+
+```
+• Novo: o popup mostra quantos vídeos você visualizou hoje, nesta semana e neste mês, logo abaixo das estatísticas
+```
+
+Caso publique acumulando desde a 1.5.1, some as notas da 1.6.0 abaixo:
 
 **English**
 
@@ -217,7 +231,7 @@ Se a v1.5.1 já foi publicada, use apenas a nota da 1.6.0:
 • Novo: o contador flutuante mostra o progresso da playlist (ex.: 11/47) enquanto você assiste a uma lista, em vez de misturar a fila com os vídeos recomendados
 ```
 
-Caso publique acumulando desde a 1.5.0, some as notas da 1.5.1 abaixo:
+Caso publique acumulando desde a 1.5.0, some também as notas da 1.5.1 abaixo:
 
 ```
 • Fixed: Like/Dislike detection is reliable again on the watch page — YouTube changed its layout and the extension sometimes read the wrong button, leaving videos unmarked

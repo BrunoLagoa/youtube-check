@@ -10,6 +10,9 @@ const els = {
   viewed:     document.getElementById('count-viewed'),
   liked:      document.getElementById('count-liked'),
   disliked:   document.getElementById('count-disliked'),
+  periodDay:   document.getElementById('count-period-day'),
+  periodWeek:  document.getElementById('count-period-week'),
+  periodMonth: document.getElementById('count-period-month'),
   progressBar: document.getElementById('progress-bar'),
   progressPct: document.getElementById('progress-pct'),
   historyList:  document.getElementById('history-list'),
@@ -42,17 +45,7 @@ function showToast(message, type = 'default') {
 // ─── STATS ────────────────────────────────────────────────────────────────────
 
 async function loadStats() {
-  return new Promise((resolve) => {
-    chrome.storage.local.get(['videos'], (result) => {
-      const videos = Object.values(result.videos || {});
-      resolve({
-        total:    videos.length,
-        liked:    videos.filter((v) => v.liked).length,
-        disliked: videos.filter((v) => v.disliked).length,
-        viewed:   videos.filter((v) => v.viewed).length,
-      });
-    });
-  });
+  return YTCheckStorage.getStats();
 }
 
 function animateNumber(el, target) {
@@ -78,6 +71,10 @@ async function refreshStats() {
   animateNumber(els.viewed,   stats.viewed);
   animateNumber(els.liked,    stats.liked);
   animateNumber(els.disliked, stats.disliked);
+
+  animateNumber(els.periodDay,   stats.viewedToday);
+  animateNumber(els.periodWeek,  stats.viewedThisWeek);
+  animateNumber(els.periodMonth, stats.viewedThisMonth);
 
   const pct = stats.total > 0 ? Math.round((stats.viewed / stats.total) * 100) : 0;
   els.progressBar.style.width = `${pct}%`;
