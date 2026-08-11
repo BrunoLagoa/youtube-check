@@ -80,6 +80,8 @@ Validate the exact live selectors before coding — YouTube's real DOM is the au
 
 ## Release flow
 
+The steps below are packaged as the project skill `/release` (`.claude/skills/release/SKILL.md`) — invoke it to cut a version. Keep the two in sync: a change to this section must be mirrored in the skill.
+
 Whenever you cut a new version / produce a build, **all of the following must be updated in the same change** so nothing drifts:
 
 1. Bump `version` in **both** `manifest.json` and `package.json` (keep them identical).
