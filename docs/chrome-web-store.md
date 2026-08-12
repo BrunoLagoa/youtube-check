@@ -157,6 +157,36 @@ Ajudar o usuário a identificar visualmente vídeos do YouTube que ele já assis
 | `scripting` | Ativar a extensão nas abas do YouTube que já estavam abertas no momento da instalação. O Chrome só injeta os scripts declarados no carregamento seguinte da página, então sem isso essas abas ficam inertes até o usuário apertar F5. Usada uma única vez, na instalação, e apenas nas abas de youtube.com já cobertas por `host_permissions`. |
 | `host_permissions: youtube.com` | Ler o estado dos botões de like/dislike nas páginas do YouTube e injetar badges visuais nas thumbnails. A extensão só funciona no YouTube. |
 
+#### Textos prontos para colar na aba "Práticas de privacidade"
+
+O painel bloqueia a publicação enquanto cada permissão do `manifest.json` não tiver
+justificativa preenchida — inclusive as que já existiam, se a aba nunca foi revisada.
+As justificativas ficam salvas entre envios; só é preciso preencher as novas.
+
+`scripting` (nova na 1.8.0):
+
+```
+A permissão scripting é usada uma única vez, no momento da instalação, para ativar a extensão nas abas do YouTube que já estavam abertas.
+
+O Chrome só injeta os content scripts declarados no manifesto quando a página é carregada novamente. Sem essa permissão, quem instala a extensão com o YouTube já aberto encontra uma aba em que nada funciona até apertar F5, o que gerou relatos de usuários de que a extensão estava quebrada.
+
+Uso exato: no evento chrome.runtime.onInstalled, e somente quando reason === "install", a extensão chama chrome.scripting.insertCSS e chrome.scripting.executeScript nas abas cuja URL corresponde a https://www.youtube.com/* ou https://youtube.com/* — exatamente os hosts já declarados em host_permissions. Não é usada em atualizações nem em nenhum outro momento.
+
+Os arquivos injetados são exclusivamente os arquivos locais já incluídos no pacote (os mesmos listados em content_scripts no manifest.json). Nenhum código remoto é baixado ou executado, nenhum dado é coletado e nenhuma outra aba ou site é acessado.
+```
+
+Versão em inglês, caso prefira responder ao revisor no idioma da revisão:
+
+```
+The scripting permission is used exactly once, at install time, to activate the extension in YouTube tabs that were already open.
+
+Chrome only injects manifest-declared content scripts on a page's next load. Without this permission, a user who installs the extension while YouTube is already open finds a tab where nothing works until they press F5 — which led to user reports that the extension was broken.
+
+Exact usage: inside the chrome.runtime.onInstalled event, and only when reason === "install", the extension calls chrome.scripting.insertCSS and chrome.scripting.executeScript on tabs whose URL matches https://www.youtube.com/* or https://youtube.com/* — precisely the hosts already declared in host_permissions. It is never used on updates or at any other time.
+
+The injected files are exclusively local files already bundled in the package (the same ones listed under content_scripts in manifest.json). No remote code is fetched or executed, no data is collected, and no other tab or site is accessed.
+```
+
 ### Uso de dados (Data usage)
 
 No formulário de privacidade do painel, declare:
