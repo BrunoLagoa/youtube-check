@@ -37,7 +37,7 @@ A Chrome Web Store **exige** uma URL HTTPS pública para a política de privacid
 ./scripts/package-extension.sh
 ```
 
-O arquivo será criado em `dist/youtube-check-v1.1.0.zip`.
+O arquivo será criado em `dist/youtube-check-v{version}.zip`, com a versão lida do `manifest.json`.
 
 **Importante:** faça upload apenas do ZIP gerado. Não inclua `.git`, `docs/`, `store/` ou `scripts/`.
 
@@ -77,7 +77,7 @@ Como funciona
 
 Recursos
 ✓ Detecção automática de Like e Dislike
-✓ Opcional: marcar como visto pelo tempo assistido — sinaliza o vídeo ao atingir uma porcentagem configurável (75%–95%, padrão 90%), mesmo sem avaliar (desligado por padrão)
+✓ Marcar como visto pelo tempo assistido — sinaliza o vídeo ao atingir uma porcentagem configurável (75%–95%, padrão 90%), mesmo sem avaliar
 ✓ Badge ou overlay configurável nas thumbnails
 ✓ Opcional: exibir o título completo dos vídeos nos cards, sem o corte em "…"
 ✓ Suporte completo a YouTube Shorts
@@ -109,7 +109,7 @@ HOW IT WORKS
 
 FEATURES
 ✓ Automatic Like/Dislike detection
-✓ Optional: mark as viewed by watch time — flags a video once you've watched a configurable amount of it (75%–95%, default 90%), even without rating it (off by default)
+✓ Mark as viewed by watch time — flags a video once you've watched a configurable amount of it (75%–95%, default 90%), even without rating it
 ✓ Configurable badge or overlay on thumbnails
 ✓ Optional: show the full video title on cards, with no "…" cut-off
 ✓ Full YouTube Shorts support
@@ -144,7 +144,7 @@ Português (Brasil)
 ### Propósito único (Single purpose)
 
 ```
-Ajudar o usuário a identificar visualmente vídeos do YouTube que ele já assistiu ou avaliou (curtido ou com dislike), exibindo badges nas thumbnails e estatísticas locais. Opcionalmente, também pode marcar como visto pelo tempo assistido (~90% do vídeo), quando o usuário ativa essa opção nas configurações — desligada por padrão.
+Ajudar o usuário a identificar visualmente vídeos do YouTube que ele já assistiu ou avaliou (curtido ou com dislike), exibindo badges nas thumbnails e estatísticas locais. Também marca como visto pelo tempo assistido (~90% do vídeo), com a porcentagem configurável e a opção desativável nas configurações.
 ```
 
 ### Justificativa de permissões
@@ -154,6 +154,7 @@ Ajudar o usuário a identificar visualmente vídeos do YouTube que ele já assis
 | `storage` | Armazenar localmente o histórico de vídeos avaliados e as preferências do usuário (cor do badge, texto, etc.). |
 | `unlimitedStorage` | Remove o limite padrão de ~10MB do `chrome.storage.local`, evitando falhas silenciosas ao salvar para usuários com histórico extenso. Nenhum dado sai do dispositivo do usuário. |
 | `alarms` | Agenda uma verificação diária que aplica a limpeza automática de histórico (configurável em "Manter histórico por"), quando o usuário optar por não manter os dados para sempre. |
+| `scripting` | Ativar a extensão nas abas do YouTube que já estavam abertas no momento da instalação. O Chrome só injeta os scripts declarados no carregamento seguinte da página, então sem isso essas abas ficam inertes até o usuário apertar F5. Usada uma única vez, na instalação, e apenas nas abas de youtube.com já cobertas por `host_permissions`. |
 | `host_permissions: youtube.com` | Ler o estado dos botões de like/dislike nas páginas do YouTube e injetar badges visuais nas thumbnails. A extensão só funciona no YouTube. |
 
 ### Uso de dados (Data usage)
@@ -199,9 +200,27 @@ Use `icons/icon-128.png` (já incluído no projeto).
 
 ---
 
-## Passo 6 — Notas da versão (What's new — v1.7.0)
+## Passo 6 — Notas da versão (What's new — v1.8.0)
 
-Se a v1.6.0 já foi publicada, use apenas a nota da 1.7.0:
+Se a v1.7.0 já foi publicada, use apenas a nota da 1.8.0:
+
+**English**
+
+```
+• Fixed: liking a video is now detected when you reach it by clicking a card too, with no page reload needed — this was why the extension seemed not to work right after installing
+• Fixed: YouTube tabs already open when you install the extension now start working straight away, no refresh needed
+• Changed: "mark as viewed by watch time" is now on by default, so watching a video through already counts towards Today, This week and This month
+```
+
+**Português (Brasil)**
+
+```
+• Correção: dar Like agora é detectado também quando você chega ao vídeo clicando num card, sem precisar recarregar a página — era o motivo de a extensão parecer não funcionar logo após a instalação
+• Correção: abas do YouTube já abertas na hora da instalação passam a funcionar na hora, sem F5
+• Mudança: "marcar como visto pelo tempo assistido" vem ligado por padrão, então assistir um vídeo até o fim já conta em Hoje, Esta semana e Este mês
+```
+
+Caso publique acumulando desde a 1.6.0, some as notas da 1.7.0 abaixo:
 
 **English**
 

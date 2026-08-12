@@ -2,6 +2,18 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.8.0] - 2026-08-12
+
+### Fixed
+
+- **Dar Like não era detectado quando você chegava ao vídeo clicando num card (sem recarregar a página).** Esse é o caminho de quase todo mundo — Home → vídeo — e era o motivo dos relatos de "a extensão não funciona logo depois de instalar", já que o F5 fazia tudo voltar ao normal. Por cerca de dez segundos após uma navegação interna, o YouTube mantém a página anterior montada, e sobram várias barras de ações invisíveis (largura zero) da grade da Home **antes** da barra real na ordem do documento — chegamos a medir seis. O monitoramento se prendia a uma dessas sobras e nunca via o clique no Like. Agora a barra é localizada a partir do botão que está de fato na tela, e não por uma busca solta no documento
+- **Rede de segurança para a avaliação**: um ouvinte de clique em fase de captura passa a cobrir também a página do vídeo (os Shorts já tinham). Mesmo que o monitoramento se perca num redesenho do YouTube, o clique em Like/Dislike não passa despercebido
+- **Abas do YouTube já abertas no momento da instalação ficavam inertes** até o usuário apertar F5 — o Chrome só injeta os scripts no carregamento seguinte da página. A extensão agora se injeta nelas na hora (daí a nova permissão `scripting`). Isso vale só na instalação: numa atualização, os scripts da versão anterior continuam declarados nessas abas e reinjetar geraria apenas erro de redeclaração
+
+### Changed
+
+- **"Marcar como visto pelo tempo assistido" agora vem ligado por padrão.** Assistir um vídeo até o fim passa a contar em *Hoje*, *Esta semana* e *Este mês* sem precisar configurar nada — antes o recurso existia mas nascia desligado, e quem instalava via os contadores parados em zero. Quem já salvou configurações alguma vez mantém a preferência atual; a mudança só alcança quem nunca mexeu nas opções
+
 ## [1.7.0] - 2026-08-11
 
 ### Added

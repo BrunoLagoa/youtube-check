@@ -544,13 +544,15 @@ const YTParser = (() => {
   }
 
   /**
-   * Check if a click target is a Shorts like/dislike button.
+   * Whether a click landed on a like/dislike control, and which one.
+   * Backs the capture-phase listener that catches ratings the attribute
+   * observer misses — on the watch page as well as in the Shorts player.
    * @param {Element} target
    * @returns {'like'|'dislike'|null}
    */
-  function getShortsRatingClickType(target) {
-    const btn = target.closest('button[aria-label]');
-    if (!btn) return null;
+  function getRatingClickType(target) {
+    const btn = target?.closest?.('button[aria-label]');
+    if (!btn || btn.closest(RATING_DECOY_SELECTOR)) return null;
 
     const label = (btn.getAttribute('aria-label') || '').toLowerCase();
     if (
@@ -669,6 +671,41 @@ const YTParser = (() => {
   }
 
   /**
+   * The action bar that actually holds the on-screen like/dislike pair — the
+   * node the watch page's rating observer must be anchored to.
+   *
+   * Resolved *from the live button*, never by a bare `document.querySelector`:
+   * for several seconds after an SPA navigation YouTube keeps the previous
+   * page's markup mounted, and a leftover zero-sized `#top-level-buttons-computed`
+   * from the home/search grid sits *earlier* in document order than the watch
+   * page's real one. Anchoring the observer to that detached copy is what made
+   * a like register only after a manual page reload.
+   *
+   * @returns {Element|null}
+   */
+  function getRatingActionBar() {
+    const btn = _findRatingButton('like') || _findRatingButton('dislike');
+
+    if (btn) {
+      return (
+        btn.closest('#top-level-buttons-computed') ||
+        btn.closest('ytd-menu-renderer') ||
+        btn.closest('segmented-like-dislike-button-view-model') ||
+        btn.closest('ytd-segmented-like-dislike-button-renderer') ||
+        btn.parentElement
+      );
+    }
+
+    // No readable button yet — scope the fallback to the watch metadata, which
+    // a leftover listing node can never be part of.
+    return (
+      document.querySelector('ytd-watch-metadata #top-level-buttons-computed') ||
+      document.querySelector('ytd-watch-metadata #actions') ||
+      null
+    );
+  }
+
+  /**
    * Check if a button element is in "active/pressed" state.
    * @param {Element|null} btn
    * @returns {boolean}
@@ -751,7 +788,8 @@ const YTParser = (() => {
     getShortsIndicatorAnchor,
     getCurrentShortsVideoId,
     getActiveVideoElement,
-    getShortsRatingClickType,
+    getRatingClickType,
+    getRatingActionBar,
     VIDEO_ELEMENTS_SELECTOR,
     VIDEO_ELEMENT_TAGS,
     SHORTS_PLAYER_SELECTOR,

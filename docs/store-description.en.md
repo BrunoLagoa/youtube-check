@@ -1,5 +1,5 @@
 Chrome Web Store listing — ENGLISH. Copy each block below (the text under a [ LABEL ] line) straight into the matching dashboard field.
-Keep in sync with store-description.pt-BR.md. Current version: 1.7.0
+Keep in sync with store-description.pt-BR.md. Current version: 1.8.0
 
 [ NAME ]
 
@@ -20,7 +20,7 @@ HOW IT WORKS
 
 FEATURES
 ✓ Automatic Like/Dislike detection
-✓ Optional: mark as viewed by watch time — flags a video once you've watched a configurable amount of it (75%–95%, default 90%), even without rating it (off by default)
+✓ Mark as viewed by watch time — flags a video once you've watched a configurable amount of it (75%–95%, default 90%), even without rating it
 ✓ Configurable badge or overlay on thumbnails
 ✓ Optional: show the full video title on cards, with no "…" cut-off
 ✓ Full YouTube Shorts support
@@ -39,6 +39,8 @@ PRIVACY
 
 Perfect for anyone who watches a lot of YouTube and wants to quickly see what they've already rated.
 
-[ WHAT'S NEW — version 1.7.0 ]
+[ WHAT'S NEW — version 1.8.0 ]
 
-• New: the popup now shows how many videos you've viewed today, this week and this month, right below the statistics
+• Fixed: liking a video is now detected when you reach it by clicking a card too, with no page reload needed — this was why the extension seemed not to work right after installing
+• Fixed: YouTube tabs already open when you install the extension now start working straight away, no refresh needed
+• Changed: "mark as viewed by watch time" is now on by default, so watching a video through already counts towards Today, This week and This month

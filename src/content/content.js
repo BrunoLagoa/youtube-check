@@ -35,6 +35,12 @@
   /** @type {MutationObserver|null} Observer for like/dislike buttons */
   let likeObserver = null;
 
+  /** @type {Element|null} Node `likeObserver` is currently anchored to */
+  let likeObserverTarget = null;
+
+  /** @type {number|null} Retries anchoring the rating observer until the action bar exists */
+  let likeObserverRetryTimer = null;
+
   /** @type {number|null} Retry timer for like/dislike detection on watch pages */
   let likeDetectTimer = null;
 
@@ -44,8 +50,8 @@
   /** @type {number|null} Polls URL changes while browsing Shorts */
   let shortsUrlPollTimer = null;
 
-  /** @type {boolean} Whether Shorts click capture is registered */
-  let shortsClickCaptureBound = false;
+  /** @type {boolean} Whether the document-level rating click capture is registered */
+  let ratingClickCaptureBound = false;
 
   /** @type {number|null} Retries bootstrap until Shorts UI is ready (F5) */
   let shortsBootstrapTimer = null;
@@ -89,6 +95,9 @@
       YTDomObserver.watchNavigation(handlePageChange);
       chrome.runtime.onMessage.addListener(onMessage);
       chrome.storage.onChanged.addListener(onStorageChanged);
+
+      // Safety net for every rating surface — see bindRatingClickCapture.
+      bindRatingClickCapture();
 
       // Load all viewed IDs from storage for fast lookups
       viewedIds = await YTCheckStorage.getViewedIds();
@@ -194,7 +203,6 @@
     if (!shortsMonitoringActive) {
       shortsMonitoringActive = true;
       _shortsSessionCounter++;
-      bindShortsClickCapture();
       startShortsUrlPolling();
       document.addEventListener('yt-navigate-finish', onShortsNavigateFinish);
       window.addEventListener('load', onShortsNavigateFinish);
@@ -227,6 +235,7 @@
       likeObserver.disconnect();
       likeObserver = null;
     }
+    likeObserverTarget = null;
     cleanupWatchProgressTracking();
   }
 
@@ -337,20 +346,40 @@
     attempt();
   }
 
-  function bindShortsClickCapture() {
-    if (shortsClickCaptureBound) return;
-    shortsClickCaptureBound = true;
+  /**
+   * Last-resort rating detection, for the watch page and the Shorts player
+   * alike: a capture-phase click listener on the document.
+   *
+   * The attribute observer can end up anchored to the wrong action bar (YouTube
+   * keeps the previous page mounted for seconds after an SPA navigation) or be
+   * torn off by a re-render, and by the time the user clicks, the retry loop
+   * that would have re-armed it has long finished. The click itself always
+   * reaches this listener, so a rating is never silently dropped.
+   */
+  function bindRatingClickCapture() {
+    if (ratingClickCaptureBound) return;
+    ratingClickCaptureBound = true;
 
     document.addEventListener('click', (event) => {
-      if (!YTParser.isShortsPlayer() || !settings.enabled) return;
+      if (!settings.enabled) return;
+      if (!YTParser.isWatchPage() && !YTParser.isShortsPlayer()) return;
+      if (!YTParser.getRatingClickType(event.target)) return;
 
-      const clickType = YTParser.getShortsRatingClickType(event.target);
-      if (!clickType) return;
-
-      // YouTube updates aria-pressed after the click handler runs
-      setTimeout(() => syncShortsLikeState(), 400);
-      setTimeout(() => syncShortsLikeState(), 900);
+      // YouTube updates aria-pressed only after its own click handler runs.
+      setTimeout(syncRatingState, 400);
+      setTimeout(syncRatingState, 1200);
     }, true);
+  }
+
+  /**
+   * Read the rating straight from the DOM and persist it, re-anchoring the
+   * observer in case the action bar was replaced meanwhile.
+   */
+  async function syncRatingState() {
+    const state = YTParser.detectLikeDislikeState();
+    if (state === null) return;
+    await handleLikeDislikeState(state);
+    setupLikeObserver();
   }
 
   function startShortsUrlPolling() {
@@ -388,19 +417,24 @@
     const root = YTParser.getShortsRoot();
     if (!root) return;
 
+    // Re-arming on an unchanged root would drop mutations mid-flight.
+    if (likeObserver && likeObserverTarget === root && root.isConnected) return;
+
     if (likeObserver) {
       likeObserver.disconnect();
       likeObserver = null;
     }
 
-    likeObserver = YTDomObserver.observeAttributes(
+    likeObserverTarget = root;
+    const observer = YTDomObserver.observeAttributes(
       root,
       ['aria-pressed', 'is-toggled', 'class'],
       () => {
-        if (likeObserver._debounce) clearTimeout(likeObserver._debounce);
-        likeObserver._debounce = setTimeout(() => syncShortsLikeState(), 300);
+        if (observer._debounce) clearTimeout(observer._debounce);
+        observer._debounce = setTimeout(() => syncShortsLikeState(), 300);
       }
     );
+    likeObserver = observer;
   }
 
   function cleanupShortsActiveObserver() {
@@ -526,7 +560,7 @@
 
   // ─── WATCH PROGRESS TRACKING (OPT-IN) ────────────────────────────────────────
   // Marks a video as "viewed" after watching most of it, even without a like/dislike.
-  // Disabled by default — gated entirely behind settings.trackWatchProgress.
+  // On by default, and gated entirely behind settings.trackWatchProgress.
 
   const DEFAULT_WATCH_PROGRESS_THRESHOLD = 0.9;
 
@@ -727,39 +761,82 @@
     // yt-smartimation renders two `segmented-like-dislike-button-view-model`
     // buffers side by side and swaps which one is visible, so watching only the
     // first would miss the state change that lands in the other.
-    const container =
-      document.querySelector('#top-level-buttons-computed') ||
-      document.querySelector('ytd-watch-metadata #actions') ||
-      document.querySelector('ytd-segmented-like-dislike-button-renderer') ||
-      document.querySelector('segmented-like-dislike-button-view-model') ||
-      document.querySelector('ytd-menu-renderer');
+    // The container is resolved from the button that is really on screen —
+    // a plain document query matches leftover copies from the page we came from.
+    const container = YTParser.getRatingActionBar();
 
-    if (!container) return;
+    if (!container) {
+      scheduleLikeObserverRetry();
+      return;
+    }
+
+    // Already watching this exact node — re-arming would drop pending mutations.
+    if (likeObserver && likeObserverTarget === container && container.isConnected) {
+      return;
+    }
 
     if (likeObserver) {
       likeObserver.disconnect();
       likeObserver = null;
     }
 
-    likeObserver = YTDomObserver.observeAttributes(
+    likeObserverTarget = container;
+    const observer = YTDomObserver.observeAttributes(
       container,
       ['aria-pressed', 'is-toggled', 'class'],
       () => {
         // Debounce: wait 300ms after last change
-        if (likeObserver._debounce) clearTimeout(likeObserver._debounce);
-        likeObserver._debounce = setTimeout(async () => {
+        if (observer._debounce) clearTimeout(observer._debounce);
+        observer._debounce = setTimeout(async () => {
           const state = YTParser.detectLikeDislikeState();
           if (state !== null) await handleLikeDislikeState(state);
+          // The action bar we're watching may have been swapped out by the
+          // re-render that produced this mutation — follow it if so.
+          setupLikeObserver();
         }, 300);
       },
       { childList: true }
     );
+    likeObserver = observer;
+  }
+
+  /**
+   * Keep looking for the action bar while YouTube mounts it. Without this the
+   * observer would be abandoned for the whole page view whenever the rating
+   * buttons happened to be a few hundred milliseconds late.
+   */
+  function scheduleLikeObserverRetry() {
+    if (likeObserverRetryTimer) return;
+
+    let attempts = 0;
+    const maxAttempts = 20;
+
+    likeObserverRetryTimer = setInterval(() => {
+      attempts++;
+
+      if (!isContextAlive() || !YTParser.isWatchPage() || attempts >= maxAttempts) {
+        clearInterval(likeObserverRetryTimer);
+        likeObserverRetryTimer = null;
+        return;
+      }
+
+      if (YTParser.getRatingActionBar()) {
+        clearInterval(likeObserverRetryTimer);
+        likeObserverRetryTimer = null;
+        setupLikeObserver();
+      }
+    }, 700);
   }
 
   function cleanupLikeObserver() {
     if (likeObserver) {
       likeObserver.disconnect();
       likeObserver = null;
+    }
+    likeObserverTarget = null;
+    if (likeObserverRetryTimer) {
+      clearInterval(likeObserverRetryTimer);
+      likeObserverRetryTimer = null;
     }
     if (likeDetectTimer) {
       clearTimeout(likeDetectTimer);

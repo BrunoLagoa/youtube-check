@@ -54,7 +54,7 @@ const YTCheckStorage = (() => {
     historyRetentionDays: 0,    // 0 = keep forever (default); otherwise auto-prune older entries
     counterPositionX: null,     // % of viewport width; null = default bottom-right corner
     counterPositionY: null,     // % of viewport height; null = default bottom-right corner
-    trackWatchProgress: false,  // opt-in: mark as viewed after watching most of a video, even without a like/dislike
+    trackWatchProgress: true,   // mark as viewed after watching most of a video, even without a like/dislike
     watchProgressThreshold: 0.9, // fraction (0–1) of the video that must be watched to auto-mark as viewed
   };
 
