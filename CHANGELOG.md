@@ -2,6 +2,14 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.8.1] - 2026-08-19
+
+### Fixed
+
+- **Shorts no carrossel ficavam sem o badge "✓ Visualizado"** — na aba *Início* de um canal e nos resultados de busca. Os mesmos Shorts apareciam corretamente marcados na aba *Shorts* do canal, o que tornava a falha especialmente confusa. Motivo: o YouTube só *às vezes* embrulha o card do Short (`ytm-shorts-lockup-view-model-v2`) num `ytd-rich-item-renderer` — na aba Shorts e na Home ele embrulha, mas no carrossel `ytd-reel-shelf-renderer` o card entra solto dentro de uma lista horizontal, e nenhum dos elementos observados casava com ele. Agora o próprio card de Short é observado, então o badge aparece em qualquer superfície
+- **O contador flutuante inflava o total na Home.** O YouTube aninha tags de card (um `yt-lockup-view-model` dentro de cada `ytd-rich-item-renderer`, por exemplo), e cada nó era contado como um vídeo — 76 nós para 31 vídeos numa Home típica. O novo `getCardRoot` reduz os nós aninhados ao card mais externo que representa o mesmo vídeo, então cada vídeo conta uma vez só. Isso também é o que permite observar o card de Short sem passar a contar em dobro as superfícies em que ele vem embrulhado
+- **Título e link dos Shorts salvos a partir de um card**: o título vinha truncado (era lido de um seletor genérico) e o link era gravado como `/watch?v=`, diferente do `/shorts/` que o player grava para o mesmo vídeo. Agora ambos saem certos
+
 ## [1.8.0] - 2026-08-12
 
 ### Fixed

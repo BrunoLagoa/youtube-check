@@ -856,11 +856,17 @@
 
     const elements = document.querySelectorAll(selector);
     const toProcess = [];
+    const seen = new Set();
     for (const el of elements) {
       const data = YTParser.extractFromElement(el);
       if (!data) continue;
-      if (processedElements.has(el) && el.dataset.ytcheckId === data.videoId) continue;
-      toProcess.push(el);
+      // Nested card tags (a Shorts lockup inside a rich item, etc.) stand for
+      // the same video — process the outermost one only.
+      const card = YTParser.getCardRoot(el, data.videoId);
+      if (seen.has(card)) continue;
+      seen.add(card);
+      if (processedElements.has(card) && card.dataset.ytcheckId === data.videoId) continue;
+      toProcess.push(card);
     }
     if (toProcess.length > 0) {
       processVideoElements(toProcess);
@@ -882,11 +888,31 @@
   }
 
   /**
+   * Collapse a batch of matched nodes onto their outermost card, dropping the
+   * repeats. The observer often reports only the inner node — YouTube inserts
+   * the lockup into a rich item that was already mounted — so mapping up here
+   * (instead of discarding the inner match) is what keeps those cards badged.
+   * @param {Element[]} elements
+   * @returns {Element[]}
+   */
+  function resolveCardRoots(elements) {
+    const cards = [];
+    const seen = new Set();
+    for (const el of elements) {
+      const card = YTParser.getCardRoot(el);
+      if (seen.has(card)) continue;
+      seen.add(card);
+      cards.push(card);
+    }
+    return cards;
+  }
+
+  /**
    * Process a batch of video card elements.
    * @param {Element[]} elements
    */
   function processVideoElements(elements) {
-    for (const el of elements) {
+    for (const el of resolveCardRoots(elements)) {
       const data = YTParser.extractFromElement(el);
       if (!data) continue;
 
@@ -1322,8 +1348,12 @@
           const data = YTParser.extractFromElement(card);
           if (!data) continue;
           videoId = data.videoId;
-          card.dataset.ytcheckId = videoId;
         }
+        // A card nested inside another card is the same video seen twice —
+        // counting both would inflate the total (the home grid alone nests a
+        // lockup inside every rich item).
+        if (YTParser.getCardRoot(card, videoId) !== card) continue;
+        card.dataset.ytcheckId = videoId;
         total++;
         if (viewedIds.has(videoId)) viewed++;
       }

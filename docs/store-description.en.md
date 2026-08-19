@@ -1,5 +1,5 @@
 Chrome Web Store listing — ENGLISH. Copy each block below (the text under a [ LABEL ] line) straight into the matching dashboard field.
-Keep in sync with store-description.pt-BR.md. Current version: 1.8.0
+Keep in sync with store-description.pt-BR.md. Current version: 1.8.1
 
 [ NAME ]
 
@@ -39,8 +39,8 @@ PRIVACY
 
 Perfect for anyone who watches a lot of YouTube and wants to quickly see what they've already rated.
 
-[ WHAT'S NEW — version 1.8.0 ]
+[ WHAT'S NEW — version 1.8.1 ]
 
-• Fixed: liking a video is now detected when you reach it by clicking a card too, with no page reload needed — this was why the extension seemed not to work right after installing
-• Fixed: YouTube tabs already open when you install the extension now start working straight away, no refresh needed
-• Changed: "mark as viewed by watch time" is now on by default, so watching a video through already counts towards Today, This week and This month
+• Fixed: Shorts in the Shorts carousel now get the "✓ Viewed" badge too — on a channel's Home tab and in search results, where they were skipped even though the very same Shorts were badged on the channel's Shorts tab
+• Fixed: the floating counter no longer inflates the total on the Home feed — it was counting the same video more than once
+• Fixed: a Short saved from a card now keeps its full title and its /shorts/ link

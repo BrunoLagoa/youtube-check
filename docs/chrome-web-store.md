@@ -230,9 +230,27 @@ Use `icons/icon-128.png` (já incluído no projeto).
 
 ---
 
-## Passo 6 — Notas da versão (What's new — v1.8.0)
+## Passo 6 — Notas da versão (What's new — v1.8.1)
 
-Se a v1.7.0 já foi publicada, use apenas a nota da 1.8.0:
+Se a v1.8.0 já foi publicada, use apenas a nota da 1.8.1:
+
+**English**
+
+```
+• Fixed: Shorts in the Shorts carousel now get the "✓ Viewed" badge too — on a channel's Home tab and in search results, where they were skipped even though the very same Shorts were badged on the channel's Shorts tab
+• Fixed: the floating counter no longer inflates the total on the Home feed — it was counting the same video more than once
+• Fixed: a Short saved from a card now keeps its full title and its /shorts/ link
+```
+
+**Português (Brasil)**
+
+```
+• Correção: os Shorts do carrossel também recebem o badge "✓ Visualizado" — na aba Início do canal e nos resultados de busca, onde ficavam de fora mesmo com os mesmos Shorts marcados na aba Shorts do canal
+• Correção: o contador flutuante não infla mais o total na Home — o mesmo vídeo estava sendo contado mais de uma vez
+• Correção: um Short salvo a partir de um card mantém o título completo e o link /shorts/
+```
+
+Caso publique acumulando desde a 1.7.0, some as notas da 1.8.0 abaixo:
 
 **English**
 

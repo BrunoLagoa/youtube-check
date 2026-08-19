@@ -1,5 +1,5 @@
 Listagem da Chrome Web Store — PORTUGUÊS (BRASIL). Copie cada bloco abaixo (o texto sob a linha [ RÓTULO ]) direto no campo correspondente do dashboard.
-Manter em sincronia com store-description.en.md. Versão atual: 1.8.0
+Manter em sincronia com store-description.en.md. Versão atual: 1.8.1
 
 [ NOME ]
 
@@ -39,8 +39,8 @@ Privacidade
 
 Ideal para quem assiste muito YouTube e quer saber rapidamente o que já passou pelo feed.
 
-[ NOVIDADES — versão 1.8.0 ]
+[ NOVIDADES — versão 1.8.1 ]
 
-• Correção: dar Like agora é detectado também quando você chega ao vídeo clicando num card, sem precisar recarregar a página — era o motivo de a extensão parecer não funcionar logo após a instalação
-• Correção: abas do YouTube já abertas na hora da instalação passam a funcionar na hora, sem F5
-• Mudança: "marcar como visto pelo tempo assistido" vem ligado por padrão, então assistir um vídeo até o fim já conta em Hoje, Esta semana e Este mês
+• Correção: os Shorts do carrossel também recebem o badge "✓ Visualizado" — na aba Início do canal e nos resultados de busca, onde ficavam de fora mesmo com os mesmos Shorts marcados na aba Shorts do canal
+• Correção: o contador flutuante não infla mais o total na Home — o mesmo vídeo estava sendo contado mais de uma vez
+• Correção: um Short salvo a partir de um card mantém o título completo e o link /shorts/

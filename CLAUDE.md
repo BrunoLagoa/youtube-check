@@ -71,6 +71,8 @@ YouTube A/B-tests its DOM and migrates components (e.g. the watch-page sidebar m
 2. Confirm `extractFromElement` resolves a `videoId` from it (anchor href), and that `getThumbnailContainer` returns the correct positioning parent for the badge.
 3. Extend the hover / viewed-tint selectors in `content/content.css` if the thumbnail container tag is new.
 
+**The same video is often several matching nodes.** YouTube nests card tags — `ytd-rich-item-renderer` > `ytm-shorts-lockup-view-model-v2` > `ytm-shorts-lockup-view-model` on the Shorts tab, `ytd-rich-item-renderer` > `yt-lockup-view-model` on the home grid — and it only wraps them *sometimes*: the `ytd-reel-shelf-renderer` carousel (channel Início tab, search) ships a bare Shorts lockup, which is why the tag has to be listed even though the wrapper already was. `YTParser.getCardRoot()` collapses a nested match onto the outermost node resolving to the same video id; `content.js` runs every batch through it before badging and skips inner matches when tallying the page counter, so listing a tag that is usually wrapped costs nothing.
+
 Validate the exact live selectors before coding — YouTube's real DOM is the authority, not assumptions. `youtube-parser.js` selectors are deliberately **layered with fallbacks** (modern `*-view-model` components → legacy `ytd-*-renderer` → `aria-label` keyword matching in **both English and Portuguese**); follow that defensive style.
 
 ### Two independent i18n systems — don't conflate them

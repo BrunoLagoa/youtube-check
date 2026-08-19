@@ -90,6 +90,15 @@ const YTParser = (() => {
 
   /**
    * All YouTube video card element tag names to observe.
+   *
+   * Shorts cards are listed on their own because YouTube only *sometimes* wraps
+   * them in a card tag we already watch: the channel's Shorts tab and the home
+   * feed's Shorts shelf put `ytm-shorts-lockup-view-model-v2` inside a
+   * `ytd-rich-item-renderer`, but the `ytd-reel-shelf-renderer` carousel (the
+   * channel's Início tab, search results) drops it straight into a
+   * `yt-horizontal-list-renderer` with no wrapper at all — which is why those
+   * Shorts had no badge. Where both nodes match, `getCardRoot` collapses them
+   * back into a single card.
    */
   const VIDEO_ELEMENT_TAGS = [
     'ytd-rich-item-renderer',          // Home grid
@@ -99,7 +108,9 @@ const YTParser = (() => {
     'ytd-grid-video-renderer',         // Channel / Playlist grid
     'ytd-playlist-video-renderer',     // Playlist list view (legacy; /playlist now ships lockups)
     'ytd-playlist-panel-video-renderer', // Playlist panel on the watch page, autoplay queue & Mix
-    'ytd-reel-item-renderer',          // Shorts shelf items (home page shelf)
+    'ytd-reel-item-renderer',          // Shorts shelf items (legacy shelf)
+    'ytm-shorts-lockup-view-model-v2', // Shorts cards (current layout, everywhere)
+    'ytm-shorts-lockup-view-model',    // Shorts cards without the v2 wrapper
     'ytd-reel-video-renderer',         // Shorts player feed items
     'ytd-rich-grid-media',             // Home (inner)
     'ytm-video-with-context-renderer', // Mobile-like renderers
@@ -129,6 +140,41 @@ const YTParser = (() => {
    */
   function getPlaylistPanelItems() {
     return document.querySelectorAll(PLAYLIST_PANEL_SELECTOR);
+  }
+
+  /**
+   * The outermost card node standing for the same video as `el`.
+   *
+   * Card tags nest: the home grid puts a `yt-lockup-view-model` (or a
+   * `ytd-rich-grid-media`) inside a `ytd-rich-item-renderer`, the Shorts tab
+   * puts a `ytm-shorts-lockup-view-model-v2` inside one, and that in turn holds
+   * a `ytm-shorts-lockup-view-model`. Every one of those matches
+   * VIDEO_ELEMENTS_SELECTOR, so without collapsing them the same video is
+   * tallied several times by the page counter and outlined several times by
+   * `highlightUnviewed`.
+   *
+   * Only nodes resolving to the *same* video id are collapsed, so a card that
+   * happens to sit inside a container holding other videos is left alone.
+   *
+   * @param {Element} el
+   * @param {string} [videoId] id already extracted from `el`, to save a re-parse
+   * @returns {Element}
+   */
+  function getCardRoot(el, videoId) {
+    if (!el?.parentElement) return el;
+
+    let outer = el.parentElement.closest(VIDEO_ELEMENTS_SELECTOR);
+    if (!outer) return el; // not nested — the common case, kept cheap
+
+    const id = videoId || extractFromElement(el)?.videoId;
+    if (!id) return el;
+
+    let root = el;
+    while (outer && extractFromElement(outer)?.videoId === id) {
+      root = outer;
+      outer = root.parentElement?.closest(VIDEO_ELEMENTS_SELECTOR) || null;
+    }
+    return root;
   }
 
   // ─── DATA EXTRACTION FROM ELEMENTS ──────────────────────────────────────────
@@ -275,6 +321,7 @@ const YTParser = (() => {
     // then the legacy ytd-* renderers.
     const titleEl =
       el.querySelector('a.ytLockupMetadataViewModelTitle') ||
+      el.querySelector('.shortsLockupViewModelHostMetadataTitle') || // Shorts cards
       el.querySelector('#video-title') ||
       el.querySelector('h3 a') ||
       el.querySelector('.title') ||
@@ -308,7 +355,12 @@ const YTParser = (() => {
       thumbEl?.getAttribute('data-thumb') ||
       `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 
-    const url = `https://www.youtube.com/watch?v=${videoId}`;
+    // Shorts cards keep their /shorts/ URL, matching what the reel renderers
+    // store — otherwise the same video would be filed under two different URLs
+    // depending on where it was seen.
+    const url = href.includes('/shorts/')
+      ? `https://www.youtube.com/shorts/${videoId}`
+      : `https://www.youtube.com/watch?v=${videoId}`;
 
     return { videoId, title, channel, thumbnail, url };
   }
@@ -795,6 +847,7 @@ const YTParser = (() => {
     SHORTS_PLAYER_SELECTOR,
     PLAYLIST_PANEL_SELECTOR,
     getPlaylistPanelItems,
+    getCardRoot,
     extractFromElement,
     extractFromShortsPlayer,
     detectLikeDislikeState,
