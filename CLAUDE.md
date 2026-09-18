@@ -95,13 +95,15 @@ Whenever you cut a new version / produce a build, **all of the following must be
 
 1. Bump `version` in **both** `manifest.json` and `package.json` (keep them identical).
 2. Add a dated entry to `CHANGELOG.md` (`## [x.y.z] - YYYY-MM-DD`, Keep a Changelog format).
-3. Update the ready-to-paste store listings — bump the version marker and add/replace the "What's new" note in **all three**, keeping PT-BR and English in step:
+3. Update the ready-to-paste store listings — add/replace the "What's new" note (its label carries the version) in **all three**, keeping PT-BR and English in step:
    - `docs/store-description.en.md` — canonical English listing (name, short + detailed description, per-version "What's new").
    - `docs/store-description.pt-BR.md` — canonical Portuguese (Brasil) listing, mirror of the English one.
    - `docs/chrome-web-store.md` — the full publishing guide; its embedded description/“What's new” blocks must match the two files above.
 4. `npm run package`, then upload the ZIP in the Chrome Web Store dashboard.
 
 The two `docs/store-description.*` files exist specifically so publishing is copy-paste: grab the whole listing from the file for the matching dashboard language. They are the source of truth for listing copy — edit them first, then reconcile `docs/chrome-web-store.md`.
+
+**Nothing but listing text in those two files** — no header, instruction or "keep in sync" lines, and no field labels: whatever is in the file can end up pasted onto the store page. The file starts straight at the name, then the short description and the detailed description, in dashboard order and separated by blank lines. Never write `[ NAME ]`, `[ SHORT DESCRIPTION — max 132 chars ]` or `[ DETAILED DESCRIPTION ]` into them; use those fields only as internal constraints while writing — the name, a short description of **at most 132 characters** (kept in step with `extDescription` in `_locales/`), then the detailed description. The one label that stays is the per-version `[ WHAT'S NEW — version x.y.z ]` / `[ NOVIDADES — versão x.y.z ]` block at the end, which is also where the current version is recorded.
 
 The privacy policy is served from `store/privacy-policy.html`.
 

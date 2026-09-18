@@ -1,15 +1,6 @@
-Chrome Web Store listing — ENGLISH. Copy each block below (the text under a [ LABEL ] line) straight into the matching dashboard field.
-Keep in sync with store-description.pt-BR.md. Current version: 1.9.0
-
-[ NAME ]
-
 YouTube Check
 
-[ SHORT DESCRIPTION — max 132 chars ]
-
 Marks YouTube videos you've rated (Like or Dislike) with a Viewed badge on thumbnails across the platform.
-
-[ DETAILED DESCRIPTION ]
 
 YouTube Check helps you avoid re-watching videos you've already rated on YouTube.
 

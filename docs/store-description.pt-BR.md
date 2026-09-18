@@ -1,15 +1,6 @@
-Listagem da Chrome Web Store — PORTUGUÊS (BRASIL). Copie cada bloco abaixo (o texto sob a linha [ RÓTULO ]) direto no campo correspondente do dashboard.
-Manter em sincronia com store-description.en.md. Versão atual: 1.9.0
-
-[ NOME ]
-
 YouTube Check
 
-[ DESCRIÇÃO CURTA — máx. 132 caracteres ]
-
 Marca vídeos do YouTube que você já avaliou (Like ou Dislike) com o badge Visualizado.
-
-[ DESCRIÇÃO DETALHADA ]
 
 YouTube Check ajuda você a não perder tempo com vídeos que já avaliou.
 

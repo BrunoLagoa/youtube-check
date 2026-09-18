@@ -47,9 +47,19 @@ CHANGELOG deste projeto é detalhado de propósito.
 3. `docs/chrome-web-store.md` — guia de publicação, cujos blocos embutidos de
    descrição e "What's new" precisam bater com os dois arquivos acima
 
+Nos dois `docs/store-description.*` vai **só o texto da listagem**: sem cabeçalho,
+sem linha de instrução ou de "manter em sincronia", e sem rótulos de campo, porque
+qualquer coisa que estiver no arquivo pode acabar colada na página da loja. O
+arquivo começa direto no nome, seguido da descrição curta e da descrição detalhada,
+nessa ordem e separados por linha em branco. Não escreva `[ NAME ]`,
+`[ SHORT DESCRIPTION — max 132 chars ]` nem `[ DETAILED DESCRIPTION ]`; use esses
+campos só como referência ao redigir. A descrição curta continua limitada a
+**132 caracteres** e acompanhando o `extDescription` de `_locales/`. O único rótulo
+que permanece é o bloco de novidades da versão, que também é onde a versão atual
+fica registrada.
+
 Em cada um:
 
-- Atualize o marcador de versão do cabeçalho (`Current version:` / `Versão atual:`)
 - Se o release muda o que a extensão faz, atualize a linha correspondente da lista
   de recursos — nos **dois** idiomas
 - Substitua o bloco `[ WHAT'S NEW — version x.y.z ]` / `[ NOVIDADES — versão x.y.z ]`
