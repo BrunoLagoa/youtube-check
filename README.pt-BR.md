@@ -6,13 +6,17 @@ Extensão Chrome que marca automaticamente vídeos do YouTube já avaliados (Lik
 
 ## Funcionalidades
 
-- ✅ Detecta automaticamente vídeos curtidos ou não curtidos
-- ✅ Badge visual "✓ Visualizado" nas thumbnails
-- ✅ Funciona em Home, Busca, Canal, Playlists, Relacionados, Inscrições, Explorar, Shorts
+- ✅ Detecta automaticamente vídeos curtidos ou não curtidos — e traz os Likes dados em outros dispositivos pela lista "Vídeos com Gostei"
+- ✅ Também marca como visto pelo tempo assistido (ligado por padrão, entre 75% e 95%), mesmo sem avaliação
+- ✅ Badge visual "✓ Visualizado" (ou overlay) nas thumbnails
+- ✅ Funciona em Home, Busca, Canal, Playlists, Relacionados, Inscrições, Explorar, Shorts e na playlist ao lado do player
+- ✅ Indicador na página do vídeo e nos Shorts ("Você já avaliou este vídeo" / "Você já assistiu a este vídeo")
+- ✅ Contador flutuante e arrastável (vistos/total, ou progresso da playlist)
 - ✅ MutationObserver para scroll infinito sem recarregar
-- ✅ Popup com estatísticas e ações (exportar/importar/limpar)
+- ✅ Popup com estatísticas (inclusive hoje / esta semana / este mês), histórico recente e ações (exportar/importar/limpar)
 - ✅ Título completo dos vídeos nos cards (opcional, sem o corte em "…")
-- ✅ Página de configurações (cor, texto, modo badge/overlay, ocultar visualizados, título completo)
+- ✅ Página de configurações (cor, texto, modo badge/overlay, ocultar visualizados, destacar não visualizados, título completo, retenção do histórico, idioma)
+- ✅ Interface em Inglês / Português (Brasil)
 - ✅ Persistência via `chrome.storage.local` e `chrome.storage.sync`
 - ✅ Manifest V3 + Performance otimizada
 
@@ -39,17 +43,29 @@ Extensão Chrome que marca automaticamente vídeos do YouTube já avaliados (Lik
 ```
 youtube-check/
 ├── manifest.json
+├── _locales/               # só os textos do manifest (nome, descrição da loja)
+│   ├── en/messages.json
+│   └── pt_BR/messages.json
 ├── icons/
 │   ├── icon-16.png
 │   ├── icon-32.png
 │   ├── icon-48.png
 │   └── icon-128.png
+├── scripts/
+│   └── package-extension.sh
 └── src/
     ├── background/
     │   └── service-worker.js
     ├── content/
     │   ├── content.js
     │   └── content.css
+    ├── i18n/
+    │   ├── messages.js     # catálogo da interface (en / pt-BR)
+    │   └── i18n.js
+    ├── onboarding/
+    │   ├── welcome.html
+    │   ├── welcome.js
+    │   └── welcome.css
     ├── popup/
     │   ├── popup.html
     │   ├── popup.js
@@ -69,7 +85,7 @@ youtube-check/
 
 - A detecção de like/dislike usa o atributo `aria-pressed` e `is-toggled` dos botões do YouTube
 - O vídeo precisa ser aberto ao menos uma vez para que a avaliação seja registrada
-- Dados salvos em `chrome.storage.local` (por dispositivo)
+- Dados salvos em `chrome.storage.local` (por dispositivo), uma chave por vídeo (`video:<id>`)
 - Configurações salvas em `chrome.storage.sync` (sincronizadas entre dispositivos)
 
 ## Publicação na Chrome Web Store
@@ -82,7 +98,7 @@ npm run package
 # ou: ./scripts/package-extension.sh
 ```
 
-O ZIP será criado em `dist/youtube-check-v1.1.0.zip`.
+O ZIP será criado em `dist/youtube-check-v{versão}.zip`, com a versão lida do `manifest.json`.
 
 ### Documentação completa
 

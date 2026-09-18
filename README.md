@@ -6,13 +6,17 @@ Chrome extension that automatically marks YouTube videos you've already rated (L
 
 ## Features
 
-- ✅ Automatically detects liked or disliked videos
-- ✅ Visual "✓ Viewed" badge on thumbnails
-- ✅ Works on Home, Search, Channel, Playlists, Related, Subscriptions, Explore, Shorts
+- ✅ Automatically detects liked or disliked videos — and picks up Likes given on other devices from your "Liked videos" list
+- ✅ Marks a video as viewed by watch time too (on by default, 75%–95% threshold), even without a rating
+- ✅ Visual "✓ Viewed" badge (or overlay) on thumbnails
+- ✅ Works on Home, Search, Channel, Playlists, Related, Subscriptions, Explore, Shorts, and the playlist queue beside the player
+- ✅ Watch page and Shorts indicator ("You already rated this video" / "You already watched this video")
+- ✅ Floating, draggable page counter (viewed/total, or playlist progress)
 - ✅ MutationObserver for infinite scroll without reloading
-- ✅ Popup with statistics and actions (export/import/clear)
+- ✅ Popup with statistics (including today / this week / this month), recent history and actions (export/import/clear)
 - ✅ Optional full video title on cards (no "…" cut-off)
-- ✅ Settings page (color, text, badge/overlay mode, hide viewed, full title)
+- ✅ Settings page (color, text, badge/overlay mode, hide viewed, highlight unviewed, full title, history retention, language)
+- ✅ English / Portuguese (Brazil) interface
 - ✅ Persistence via `chrome.storage.local` and `chrome.storage.sync`
 - ✅ Manifest V3 + optimized performance
 
@@ -39,17 +43,29 @@ Chrome extension that automatically marks YouTube videos you've already rated (L
 ```
 youtube-check/
 ├── manifest.json
+├── _locales/               # manifest strings only (name, store description)
+│   ├── en/messages.json
+│   └── pt_BR/messages.json
 ├── icons/
 │   ├── icon-16.png
 │   ├── icon-32.png
 │   ├── icon-48.png
 │   └── icon-128.png
+├── scripts/
+│   └── package-extension.sh
 └── src/
     ├── background/
     │   └── service-worker.js
     ├── content/
     │   ├── content.js
     │   └── content.css
+    ├── i18n/
+    │   ├── messages.js     # en / pt-BR UI catalog
+    │   └── i18n.js
+    ├── onboarding/
+    │   ├── welcome.html
+    │   ├── welcome.js
+    │   └── welcome.css
     ├── popup/
     │   ├── popup.html
     │   ├── popup.js
@@ -69,7 +85,7 @@ youtube-check/
 
 - Like/dislike detection uses the `aria-pressed` attribute and `is-toggled` class on YouTube buttons
 - The video must be opened at least once for the rating to be recorded
-- Data is stored in `chrome.storage.local` (per device)
+- Data is stored in `chrome.storage.local` (per device), one key per video (`video:<id>`)
 - Settings are stored in `chrome.storage.sync` (synced across devices)
 
 ## Chrome Web Store publishing
@@ -82,7 +98,7 @@ npm run package
 # or: ./scripts/package-extension.sh
 ```
 
-The ZIP will be created at `dist/youtube-check-v1.1.0.zip`.
+The ZIP will be created at `dist/youtube-check-v{version}.zip`, with the version read from `manifest.json`.
 
 ### Full documentation
 

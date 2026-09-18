@@ -1,7 +1,14 @@
 /**
  * YouTube Check — Background Service Worker (Manifest V3)
- * Handles lifecycle events and cross-context messaging.
+ * Handles lifecycle events: onboarding, first-run injection, storage
+ * migration and history retention.
  */
+
+// Same storage layer (and the i18n it normalizes settings with) as every other
+// context, so the worker can never drift from the record format. Classic
+// worker on purpose: these files are plain scripts that declare globals, which
+// an ES-module worker could not share.
+importScripts('../i18n/messages.js', '../i18n/i18n.js', '../storage/storage.js');
 
 const PRUNE_ALARM = 'ytcheck-prune-old-videos';
 
@@ -19,6 +26,10 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
     // so re-running the files there would only throw redeclaration errors.
     injectIntoOpenYouTubeTabs();
   }
+
+  // Updating from before 1.9.0: move the single `videos` map into per-video
+  // keys now, rather than waiting for the first page that touches the history.
+  YTCheckStorage.migrateLegacyVideos();
 
   chrome.alarms.create(PRUNE_ALARM, { periodInMinutes: 1440 });
 });
@@ -56,92 +67,18 @@ async function injectIntoOpenYouTubeTabs() {
   }
 }
 
-// Defensive re-arm on browser startup, in case onInstalled was missed.
+// Defensive re-arm on browser startup, in case onInstalled was missed — and a
+// second chance for a migration the browser closed in the middle of.
 chrome.runtime.onStartup.addListener(() => {
+  YTCheckStorage.migrateLegacyVideos();
   chrome.alarms.create(PRUNE_ALARM, { periodInMinutes: 1440 });
 });
 
 // ─── HISTORY RETENTION (AUTO-CLEANUP) ─────────────────────────────────────────
 
-chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === PRUNE_ALARM) pruneOldVideos();
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+  if (alarm.name !== PRUNE_ALARM) return;
+  // No-op when historyRetentionDays is 0 (default — keep forever).
+  const { historyRetentionDays } = await YTCheckStorage.getSettings();
+  await YTCheckStorage.pruneOldVideos(historyRetentionDays);
 });
-
-/**
- * Remove tracked videos last updated before the user's configured retention
- * window. No-op when historyRetentionDays is 0/unset (default — keep forever).
- */
-async function pruneOldVideos() {
-  const { settings } = await chrome.storage.sync.get(['settings']);
-  const retentionDays = settings?.historyRetentionDays || 0;
-  if (retentionDays <= 0) return;
-
-  const { videos } = await chrome.storage.local.get(['videos']);
-  if (!videos) return;
-
-  const cutoff = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
-  let removed = 0;
-
-  for (const [id, data] of Object.entries(videos)) {
-    if ((data.updatedAt || 0) < cutoff) {
-      delete videos[id];
-      removed++;
-    }
-  }
-
-  if (removed > 0) {
-    await chrome.storage.local.set({ videos });
-  }
-}
-
-// ─── MESSAGE ROUTER ───────────────────────────────────────────────────────────
-
-/**
- * Route messages between popup/options and content scripts.
- */
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  switch (message.action) {
-    // Forward refresh request to all YouTube tabs
-    case 'refreshAllTabs':
-      refreshYouTubeTabs().then((count) => sendResponse({ ok: true, tabs: count }));
-      return true;
-
-    // Export: get all data and return it
-    case 'exportData':
-      chrome.storage.local.get(['videos'], (result) => {
-        const data = {
-          exportedAt: Date.now(),
-          version: chrome.runtime.getManifest().version,
-          videos: result.videos || {},
-        };
-        sendResponse({ ok: true, data });
-      });
-      return true;
-
-    default:
-      break;
-  }
-});
-
-// ─── HELPERS ─────────────────────────────────────────────────────────────────
-
-/**
- * Send a 'refresh' message to all active YouTube tabs.
- * @returns {Promise<number>} Number of tabs messaged
- */
-async function refreshYouTubeTabs() {
-  const tabs = await chrome.tabs.query({
-    url: ['https://www.youtube.com/*', 'https://youtube.com/*'],
-  });
-
-  let count = 0;
-  for (const tab of tabs) {
-    try {
-      await chrome.tabs.sendMessage(tab.id, { action: 'refresh' });
-      count++;
-    } catch {
-      // Tab may not have the content script loaded yet
-    }
-  }
-  return count;
-}

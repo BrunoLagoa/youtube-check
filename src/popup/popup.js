@@ -44,10 +44,6 @@ function showToast(message, type = 'default') {
 
 // ─── STATS ────────────────────────────────────────────────────────────────────
 
-async function loadStats() {
-  return YTCheckStorage.getStats();
-}
-
 function animateNumber(el, target) {
   const start = parseInt(el.textContent) || 0;
   const duration = 500;
@@ -65,7 +61,9 @@ function animateNumber(el, target) {
 }
 
 async function refreshStats() {
-  const stats = await loadStats();
+  // One read of the history feeds both the numbers and the list below.
+  const videos = await YTCheckStorage.getAllVideos();
+  const stats = await YTCheckStorage.getStats(videos);
 
   animateNumber(els.total,    stats.total);
   animateNumber(els.viewed,   stats.viewed);
@@ -81,20 +79,52 @@ async function refreshStats() {
   els.progressPct.textContent = `${pct}%`;
   document.querySelector('.progress-bar-track').setAttribute('aria-valuenow', pct);
 
-  await renderHistory();
+  renderHistory(videos);
 }
 
 // ─── HISTORY ──────────────────────────────────────────────────────────────────
 
-async function renderHistory() {
-  const data = await new Promise((resolve) => {
-    chrome.storage.local.get(['videos'], (r) => resolve(r.videos || {}));
-  });
+/**
+ * Records are page text (titles, channel names) or come from an imported
+ * file, so everything interpolated into the list's HTML goes through here.
+ * @param {*} value
+ * @returns {string}
+ */
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (ch) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[ch]));
+}
 
-  const all = Object.values(data);
+/**
+ * `url` if it is an https URL on one of the allowed hosts, else null — an
+ * imported record's `javascript:` link must never become clickable.
+ * @param {string} url
+ * @param {RegExp} hostPattern
+ * @returns {string|null}
+ */
+function safeUrl(url, hostPattern) {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' && hostPattern.test(parsed.hostname) ? parsed.href : null;
+  } catch {
+    return null;
+  }
+}
+
+const YOUTUBE_HOST = /^(www\.)?youtube\.com$/;
+const THUMBNAIL_HOST = /^i\d*\.ytimg\.com$/;
+
+/**
+ * Render the ten most recently viewed videos — ordered and dated by when each
+ * became viewed, the same clock the period counters above use.
+ * @param {object} videos map of videoId -> record
+ */
+function renderHistory(videos) {
+  const all = Object.values(videos);
   const viewed = all
     .filter((v) => v.viewed)
-    .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))
+    .sort((a, b) => YTCheckStorage.getViewedAt(b) - YTCheckStorage.getViewedAt(a))
     .slice(0, 10);
 
   const viewedCount = all.filter((v) => v.viewed).length;
@@ -114,7 +144,10 @@ async function renderHistory() {
 
   for (const video of viewed) {
     const li = document.createElement('li');
-    const thumbSrc = video.thumbnail || `https://i.ytimg.com/vi/${video.videoId}/mqdefault.jpg`;
+    const videoId = encodeURIComponent(video.videoId || '');
+    const href = safeUrl(video.url, YOUTUBE_HOST) || `https://www.youtube.com/watch?v=${videoId}`;
+    const thumbSrc = safeUrl(video.thumbnail, THUMBNAIL_HOST) || `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`;
+    const title = escapeHtml(video.title || video.videoId);
 
     // A video can also be viewed purely by watch time — without that third
     // case it would be mislabelled as disliked.
@@ -128,22 +161,28 @@ async function renderHistory() {
     }
 
     li.innerHTML = `
-      <a class="history-item" href="${video.url || `https://youtube.com/watch?v=${video.videoId}`}" target="_blank" title="${video.title || video.videoId}">
+      <a class="history-item" href="${escapeHtml(href)}" target="_blank" title="${title}">
         <div class="history-thumb">
-          <img src="${thumbSrc}" alt="" loading="lazy" onerror="this.style.display='none'" />
+          <img src="${escapeHtml(thumbSrc)}" alt="" loading="lazy" />
           <div class="history-thumb-badge">✓</div>
         </div>
         <div class="history-info">
-          <span class="history-video-title">${video.title || video.videoId}</span>
+          <span class="history-video-title">${title}</span>
           <div class="history-meta">
-            ${video.channel ? `<span class="history-channel">${video.channel}</span>` : ''}
+            ${video.channel ? `<span class="history-channel">${escapeHtml(video.channel)}</span>` : ''}
             ${statusBadge}
-            <span class="history-date">${YTCheckI18n.formatDate(video.updatedAt)}</span>
+            <span class="history-date">${YTCheckI18n.formatDate(YTCheckStorage.getViewedAt(video))}</span>
           </div>
         </div>
-        <button type="button" class="history-delete" data-video-id="${video.videoId}" title="${YTCheckI18n.t('removeFromHistory')}" aria-label="${YTCheckI18n.t('removeFromHistory')}">×</button>
+        <button type="button" class="history-delete" data-video-id="${escapeHtml(video.videoId)}" title="${YTCheckI18n.t('removeFromHistory')}" aria-label="${YTCheckI18n.t('removeFromHistory')}">×</button>
       </a>
     `;
+
+    // Extension pages run under a CSP that blocks inline handlers, so an
+    // `onerror="…"` attribute here would never fire — wire it up in script.
+    const img = li.querySelector('img');
+    img.addEventListener('error', () => { img.style.display = 'none'; }, { once: true });
+
     els.historyList.appendChild(li);
   }
 }
@@ -206,24 +245,18 @@ els.btnRefresh.addEventListener('click', async () => {
 });
 
 els.btnExport.addEventListener('click', async () => {
-  chrome.storage.local.get(['videos'], (result) => {
-    const data = {
-      exportedAt: new Date().toISOString(),
-      version: chrome.runtime.getManifest().version,
-      videos: result.videos || {},
-    };
+  const json = await YTCheckStorage.exportVideos();
 
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    const date = new Date().toISOString().split('T')[0];
-    a.href = url;
-    a.download = `youtube-check-${date}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().split('T')[0];
+  a.href = url;
+  a.download = `youtube-check-${date}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
 
-    showToast(YTCheckI18n.t('exportSuccess'), 'success');
-  });
+  showToast(YTCheckI18n.t('exportSuccess'), 'success');
 });
 
 els.btnImport.addEventListener('click', () => {
@@ -256,14 +289,13 @@ els.importFile.addEventListener('change', (e) => {
   reader.readAsText(file);
 });
 
-els.btnClear.addEventListener('click', () => {
+els.btnClear.addEventListener('click', async () => {
   if (!confirm(YTCheckI18n.t('confirmClear'))) return;
 
-  chrome.storage.local.set({ videos: {} }, async () => {
-    await refreshStats();
-    sendToYouTube('clearHistory');
-    showToast(YTCheckI18n.t('historyCleared'), 'success');
-  });
+  await YTCheckStorage.clearVideos();
+  await refreshStats();
+  sendToYouTube('clearHistory');
+  showToast(YTCheckI18n.t('historyCleared'), 'success');
 });
 
 els.btnSettings.addEventListener('click', () => {

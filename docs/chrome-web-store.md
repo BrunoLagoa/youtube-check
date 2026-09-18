@@ -76,13 +76,13 @@ Como funciona
 • Ao navegar (Home, Busca, Canal, Playlists, Shorts, a lista de recomendados e a playlist ao lado do vídeo), vídeos já avaliados aparecem com o badge "✓ Visualizado"
 
 Recursos
-✓ Detecção automática de Like e Dislike
+✓ Detecção automática de Like e Dislike — Likes dados no celular ou na TV entram pela lista "Vídeos com Gostei"
 ✓ Marcar como visto pelo tempo assistido — sinaliza o vídeo ao atingir uma porcentagem configurável (75%–95%, padrão 90%), mesmo sem avaliar
 ✓ Badge ou overlay configurável nas thumbnails
 ✓ Opcional: exibir o título completo dos vídeos nos cards, sem o corte em "…"
 ✓ Suporte completo a YouTube Shorts
 ✓ Contador flutuante de vídeos vistos na página — mostra o progresso da playlist quando você está acompanhando uma lista; dispensável por página e arrastável para qualquer posição (clique duplo restaura o canto)
-✓ Indicador na página do vídeo ("Você já avaliou este vídeo")
+✓ Indicador na página do vídeo e nos Shorts ("Você já avaliou este vídeo" / "Você já assistiu a este vídeo")
 ✓ Popup com estatísticas e histórico recente — inclui quantos vídeos você visualizou hoje, nesta semana e neste mês; remova itens individuais ou limpe tudo
 ✓ Limpeza automática do histórico (para sempre, ou 30 / 90 / 180 / 365 dias)
 ✓ Exportar e importar dados (JSON)
@@ -108,13 +108,13 @@ HOW IT WORKS
 • While browsing Home, Search, Channels, Playlists, Shorts, and both the suggested videos and the playlist queue beside the video you're watching, rated videos show a "✓ Viewed" badge on thumbnails
 
 FEATURES
-✓ Automatic Like/Dislike detection
+✓ Automatic Like/Dislike detection — Likes given on your phone or TV are picked up from your "Liked videos" list
 ✓ Mark as viewed by watch time — flags a video once you've watched a configurable amount of it (75%–95%, default 90%), even without rating it
 ✓ Configurable badge or overlay on thumbnails
 ✓ Optional: show the full video title on cards, with no "…" cut-off
 ✓ Full YouTube Shorts support
 ✓ Floating page counter (viewed/total on the current listing) — reports your progress through a playlist while you watch one; dismissible per page and draggable to any position (double-click to reset)
-✓ Watch page indicator ("You already rated this video")
+✓ Watch page and Shorts indicator ("You already rated this video" / "You already watched this video")
 ✓ Popup with statistics and recent history — including how many videos you've viewed today, this week and this month; remove individual videos or clear everything
 ✓ Automatic history cleanup (keep forever, or 30 / 90 / 180 / 365 days)
 ✓ Export and import your data (JSON)
@@ -230,9 +230,31 @@ Use `icons/icon-128.png` (já incluído no projeto).
 
 ---
 
-## Passo 6 — Notas da versão (What's new — v1.8.1)
+## Passo 6 — Notas da versão (What's new — v1.9.0)
 
-Se a v1.8.0 já foi publicada, use apenas a nota da 1.8.1:
+Se a v1.8.1 já foi publicada, use apenas a nota da 1.9.0:
+
+**English**
+
+```
+• New: Likes you give on your phone, TV or another browser now count too — open your "Liked videos" list and every video in it gets the "✓ Viewed" badge
+• New: videos marked as viewed by watch time now get their own indicator on the watch page and in Shorts ("You already watched this video") — it also shows up the moment you reach the watch-time threshold
+• Improved: your history is now saved one video at a time, so saving and syncing stay fast however long it gets. Existing data is migrated automatically, and JSON backups keep the same format
+• Fixed: a Like given at the same moment watch time marked the video — or saves from two tabs at once — could cancel each other out
+• Fixed: the popup's recent history is now ordered and dated by when each video was viewed, matching the Today / This week / This month counters, and broken thumbnails there are hidden
+```
+
+**Português (Brasil)**
+
+```
+• Novo: Likes dados no celular, na TV ou em outro navegador também passam a contar — abra a lista "Vídeos com Gostei" e todos os vídeos dela ganham o badge "✓ Visualizado"
+• Novo: vídeos marcados como vistos pelo tempo assistido ganham um indicador próprio na página do vídeo e nos Shorts ("Você já assistiu a este vídeo") — que aparece também no instante em que você atinge a porcentagem configurada
+• Melhoria: o histórico passa a ser salvo vídeo a vídeo, então salvar e sincronizar continuam rápidos por maior que ele seja. Os dados existentes são migrados automaticamente, e os backups JSON mantêm o mesmo formato
+• Correção: um Like dado no mesmo instante em que o tempo assistido marcava o vídeo — ou gravações de duas abas ao mesmo tempo — podiam se anular
+• Correção: o histórico recente do popup agora é ordenado e datado por quando cada vídeo foi visualizado, igual aos contadores Hoje / Esta semana / Este mês, e miniaturas quebradas ali ficam ocultas
+```
+
+Caso publique acumulando desde a 1.8.0, some as notas da 1.8.1 abaixo:
 
 **English**
 

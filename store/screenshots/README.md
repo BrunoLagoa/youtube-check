@@ -22,7 +22,7 @@ Use esses arquivos em **Capturas de tela localizadas** no Developer Dashboard.
 ## Sugestões de captura
 
 1. **Home** — grid com badges "✓ Visualizado"
-2. **Watch** — indicador "Você já avaliou este vídeo"
+2. **Watch** — indicador "Você já avaliou este vídeo" (ou "Você já assistiu a este vídeo", para vídeos marcados pelo tempo assistido)
 3. **Popup** — estatísticas e histórico
 4. **Shorts** — contador de sessão visível
 5. **Configurações** — página de opções

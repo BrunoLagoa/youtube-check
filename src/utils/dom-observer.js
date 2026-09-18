@@ -159,43 +159,10 @@ const YTDomObserver = (() => {
     return attrObserver;
   }
 
-  /**
-   * Call `callback` once `selector` matches an element in the DOM.
-   * Useful after hard reloads when YouTube mounts its UI asynchronously.
-   *
-   * @param {string} selector
-   * @param {function(Element): void} callback
-   * @param {{ root?: Element, timeout?: number }} [options]
-   */
-  function whenReady(selector, callback, options = {}) {
-    const { root = document.documentElement, timeout = 30000 } = options;
-    const existing = document.querySelector(selector);
-    if (existing) {
-      callback(existing);
-      return;
-    }
-
-    let timer = null;
-    const observer = new MutationObserver(() => {
-      const el = document.querySelector(selector);
-      if (!el) return;
-      observer.disconnect();
-      if (timer) clearTimeout(timer);
-      callback(el);
-    });
-
-    observer.observe(root, { childList: true, subtree: true });
-
-    if (timeout > 0) {
-      timer = setTimeout(() => observer.disconnect(), timeout);
-    }
-  }
-
   return {
     start,
     stop,
     watchNavigation,
     observeAttributes,
-    whenReady,
   };
 })();

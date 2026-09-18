@@ -2,6 +2,31 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.9.0] - 2026-09-18
+
+### Added
+
+- **Likes dados em outros dispositivos passam a ser marcados.** Ao abrir a lista "Vídeos com Gostei" (`/playlist?list=LL`, ou essa mesma lista na fila ao lado do player), cada vídeo dela é gravado como curtido — inclusive os que forem aparecendo ao rolar. Até aqui um Like só era registrado quando o vídeo era aberto neste navegador: Likes dados no celular, na TV ou em outro navegador deixavam o vídeo sem badge, o que parecia falha na detecção (e era o caso dos relatos de "dei Like e não marcou" investigados nesta versão — a detecção na página do vídeo segue funcionando no layout atual do YouTube). A lista é o registro oficial do YouTube, então vale sobre o que estiver gravado: vídeos já curtidos não são regravados, um Dislike antigo dá lugar ao Like, e título e canal lidos na página do vídeo são preservados
+- **Indicador "Você já assistiu a este vídeo"** na página do vídeo e nos Shorts, para vídeos marcados como vistos pelo tempo assistido (sem Like nem Dislike). Até aqui o aviso só existia para vídeos avaliados: um vídeo assistido até o fim ganhava o badge nas listagens, mas nenhum aviso ao ser reaberto. O indicador aparece também no instante em que o vídeo atinge a porcentagem configurada, e remover o Like de um vídeo já assistido troca o aviso de "avaliou" para "assistiu" em vez de apagá-lo. Quando há avaliação e tempo assistido, a avaliação prevalece
+
+### Changed
+
+- **O histórico passa a ser guardado com uma chave por vídeo** (`video:<id>`) em vez de um único mapa `videos`. Com o mapa único, cada gravação reescrevia o histórico inteiro, e o evento de mudança do storage entregava duas cópias completas dele a cada aba do YouTube aberta — um custo que crescia com o tamanho do histórico. Agora uma gravação toca e transmite só o registro alterado, e as abas aplicam a mudança sem reler tudo; mudar configurações (inclusive arrastar o contador) também deixou de reler o histórico em todas as abas. A migração roda sozinha na atualização, não descarta nada (se o mesmo vídeo já tiver registro no formato novo, ele prevalece por ser mais recente) e pode se repetir sem efeito colateral se for interrompida. O JSON de exportação/importação manteve o formato `{ videos: { … } }`, então backups antigos e novos continuam intercambiáveis
+- **Histórico recente do popup ordenado e datado por quando o vídeo passou a contar como visualizado** (`viewedAt`), o mesmo relógio dos contadores *Hoje*, *Esta semana* e *Este mês*. Antes a lista usava `updatedAt`, então um vídeo visto meses atrás subia ao topo como "agora" só por ter a avaliação trocada. A limpeza automática continua usando `updatedAt` (última atividade), de propósito: um vídeo reavaliado ontem não deve ser apagado por ter sido visto há muito tempo
+- O service worker passa a carregar o mesmo `storage.js` do resto da extensão (via `importScripts`), em vez de manter uma cópia própria da limpeza de histórico que teria de acompanhar o formato novo — por isso deixou de ser um worker do tipo `module`
+- Tela de boas-vindas: o destaque do título completo (recurso da 1.5.0) deixou de ser apresentado como "Novidade" e passou a ser uma "Dica"
+
+### Fixed
+
+- **Título lido dos cards do layout atual incluía a duração** ("… 10 minutos e 7 segundos"), herdada do `aria-label` do link; agora vem do texto do link. Passou a importar porque a sincronização acima grava dados lidos do card
+- **Gravações simultâneas podiam se anular.** Um Like dado no mesmo instante em que o tempo assistido marcava o vídeo — ou gravações de duas abas ao mesmo tempo — liam o mesmo estado antigo, e a última gravação desfazia a outra. As gravações agora passam por uma fila dentro de cada contexto e, com uma chave por vídeo, abas diferentes deixam de disputar o mesmo registro. Num teste com latência simulada, a versão anterior perdia uma das duas gravações em cerca de 75% das rodadas; a nova, em nenhuma
+- **Miniaturas quebradas no histórico do popup nunca eram ocultadas**: o fallback era um `onerror` inline, e a CSP das páginas de extensão do Manifest V3 bloqueia handlers inline. Agora o ouvinte é registrado por script
+- **Título e canal entravam como HTML no histórico do popup**, sem escape — um título com `<` ou um backup importado com HTML ou link `javascript:` era interpretado. Todo texto passa a ser escapado, e link e miniatura só são usados quando são https do YouTube; caso contrário, são reconstruídos a partir do ID do vídeo
+
+### Removed
+
+- Código sem uso: `whenReady` (dom-observer), `isShortsPage`, `isShortsShelf` e `SHORTS_PLAYER_SELECTOR` (parser), o observador `shortsActiveObserver` que nunca chegava a ser criado, `resetSettings` (storage), a mensagem `getStats` do content script e as rotas `refreshAllTabs`/`exportData` do service worker, que nenhuma parte da extensão chamava
+
 ## [1.8.1] - 2026-08-19
 
 ### Fixed

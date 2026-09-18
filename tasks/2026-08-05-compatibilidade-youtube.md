@@ -1,7 +1,10 @@
 # Plano de desenvolvimento — Compatibilidade com o YouTube (agosto/2026)
 
-> **Status:** aberto · **Criado em:** 2026-08-05 · **Base:** `main` @ `61e1afa` · **Versão atual:** 1.5.0
-> **Alvo de release:** 1.5.1 (correções de compatibilidade)
+> **Status:** ✅ concluído — entregue na 1.5.1 (2026-08-05); pendência da T5 validada em 2026-09-18
+> **Criado em:** 2026-08-05 · **Base:** `main` @ `61e1afa` · **Versão na época:** 1.5.0
+>
+> Documento histórico: registra o levantamento do DOM de agosto/2026 e as decisões que
+> ainda explicam o parser atual. Não há tarefa aberta aqui.
 
 ---
 
@@ -273,8 +276,11 @@ do reel são lidos por seletores mortos (`h2`, `#video-title`, `ytd-channel-name
       sendo `document.title`.
 - [x] `extractCurrentVideoMeta()` (`content.js`) delega o canal do Short ao parser em vez de
       repetir seletores `[is-active]` mortos.
-- [ ] Revalidar `getShortsRatingClickType` contra os `aria-label` atuais *(pendente — depende de
-      um clique real de like/dislike; ver §6)*.
+- [x] Revalidar a classificação de clique contra os `aria-label` atuais — a função virou
+      `getRatingClickType` na 1.8.0 e cobre watch page e Shorts. Validado em 2026-09-18 sem clicar
+      (só lendo o DOM): o único botão de avaliação visível no Short é
+      `marcar este vídeo como "Gostei" com mais N pessoas` → `like`; nenhum outro botão visível casa
+      com as palavras-chave, e o Shorts segue sem botão de Dislike.
 
 **Critério de aceite:** curtir/descurtir um Short reflete no histórico; o registro salvo tem
 título e canal preenchidos.
@@ -353,10 +359,10 @@ Sempre confirmar visualmente com a aba em primeiro plano.
 T1 ✅ código  ──▶  T2 ✅ código  ──▶  T5 ✅ código  ──▶  T8 ✅ código
                               │
                               ▼
-                    VALIDAÇÃO NO NAVEGADOR  ← estamos aqui
+                    VALIDAÇÃO NO NAVEGADOR  ✅
                               │
                               ▼
-                            T9 (release 1.5.1)
+                            T9 (release 1.5.1) ✅
 
 T3, T4, T6, T7 — canceladas (não eram bugs, ver §3.1)
 ```
@@ -388,3 +394,4 @@ Não há suíte de testes: a validação é dirigir a extensão real no youtube.
 | 2026-08-05 | T3, T4, T6 e T7 canceladas após teste comportamental: contar ocorrências do seletor antigo prova que o DOM mudou, não que o código quebrou (§3.1). |
 | 2026-08-05 | Confiabilidade de botão = **caixa não-zero**, não blocklist de contêiner — assim o botão de tela cheia (`yt-player-quick-action-buttons`) continua funcionando quando é o controle real. |
 | 2026-08-05 | `detectLikeDislikeState()` devolve `null` em vez de chutar `{false,false}`: o chute era o que apagava marcações existentes. |
+| 2026-09-18 | Plano encerrado. Pendência da T5 validada no DOM real; o upload da 1.5.1 já foi superado pelas versões seguintes (1.6.0 → 1.9.0). |

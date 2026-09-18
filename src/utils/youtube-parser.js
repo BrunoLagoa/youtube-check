@@ -54,36 +54,14 @@ const YTParser = (() => {
   }
 
   /**
-   * Determine if we're on a Shorts page.
-   * @returns {boolean}
-   */
-  /**
    * Determine if we're on the Shorts PLAYER page (/shorts/VIDEO_ID).
    * This is like a watch page but for Shorts.
    * @returns {boolean}
    */
   function isShortsPlayer() {
-    const path = window.location.pathname;
-    // /shorts/ID has exactly 3 parts: ['', 'shorts', 'ID']
-    const parts = path.split('/').filter(Boolean);
-    return parts[0] === 'shorts' && parts.length >= 2 && parts[1].length > 0;
-  }
-
-  /**
-   * Determine if we're on the Shorts shelf/listing page (/shorts without ID).
-   * @returns {boolean}
-   */
-  function isShortsShelf() {
+    // Filtered path parts: ['shorts', 'ID']
     const parts = window.location.pathname.split('/').filter(Boolean);
-    return parts[0] === 'shorts' && parts.length === 1;
-  }
-
-  /**
-   * @deprecated Use isShortsPlayer() or isShortsShelf() instead.
-   * Kept for backward compatibility.
-   */
-  function isShortsPage() {
-    return isShortsPlayer() || isShortsShelf();
+    return parts[0] === 'shorts' && parts.length >= 2 && parts[1].length > 0;
   }
 
   // ─── ELEMENT SELECTORS ───────────────────────────────────────────────────────
@@ -122,12 +100,6 @@ const YTParser = (() => {
   const VIDEO_ELEMENTS_SELECTOR = VIDEO_ELEMENT_TAGS.join(',');
 
   /**
-   * Selectors for elements INSIDE the Shorts full-screen player (`/shorts/ID`).
-   * Each reel video is a separate `ytd-reel-video-renderer`.
-   */
-  const SHORTS_PLAYER_SELECTOR = 'ytd-reel-video-renderer';
-
-  /**
    * The playlist queue rendered beside the player on `/watch?list=...`.
    * Kept separate from the generic card selector so the page counter can scope
    * itself to the playlist instead of mixing it with the recommendations.
@@ -140,6 +112,30 @@ const YTParser = (() => {
    */
   function getPlaylistPanelItems() {
     return document.querySelectorAll(PLAYLIST_PANEL_SELECTOR);
+  }
+
+  /** Playlist id of the signed-in user's own "Liked videos" list. */
+  const LIKED_LIST_ID = 'LL';
+
+  /**
+   * Whether a card is an item of the user's "Liked videos" list — on
+   * `/playlist?list=LL` or in that list's queue beside the player. Every such
+   * item links with `list=LL`, and membership is YouTube's own record of a Like,
+   * given from any device.
+   * @param {Element} el
+   * @returns {boolean}
+   */
+  function isLikedListItem(el) {
+    for (const a of el.querySelectorAll(`a[href*="list=${LIKED_LIST_ID}"]`)) {
+      try {
+        if (new URL(a.getAttribute('href'), location.origin).searchParams.get('list') === LIKED_LIST_ID) {
+          return true;
+        }
+      } catch {
+        // Malformed href — not a list link.
+      }
+    }
+    return false;
   }
 
   /**
@@ -333,6 +329,9 @@ const YTParser = (() => {
 
     const title = titleEl
       ? (titleEl.getAttribute('title') ||
+         // The lockup title's aria-label appends the duration ("… 10 minutos
+         // e 7 segundos"); its text is the bare title.
+         (titleEl.classList.contains('ytLockupMetadataViewModelTitle') ? titleEl.textContent : '') ||
          titleEl.getAttribute('aria-label') ||
          titleEl.textContent ||
          '').trim()
@@ -832,9 +831,7 @@ const YTParser = (() => {
     extractVideoId,
     getCurrentVideoId,
     isWatchPage,
-    isShortsPage,
     isShortsPlayer,
-    isShortsShelf,
     getActiveShortsReel,
     getShortsRoot,
     getShortsIndicatorAnchor,
@@ -844,9 +841,9 @@ const YTParser = (() => {
     getRatingActionBar,
     VIDEO_ELEMENTS_SELECTOR,
     VIDEO_ELEMENT_TAGS,
-    SHORTS_PLAYER_SELECTOR,
     PLAYLIST_PANEL_SELECTOR,
     getPlaylistPanelItems,
+    isLikedListItem,
     getCardRoot,
     extractFromElement,
     extractFromShortsPlayer,

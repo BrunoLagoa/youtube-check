@@ -44,9 +44,6 @@
   /** @type {number|null} Retry timer for like/dislike detection on watch pages */
   let likeDetectTimer = null;
 
-  /** @type {MutationObserver|null} Watches active Short changes in the player feed */
-  let shortsActiveObserver = null;
-
   /** @type {number|null} Polls URL changes while browsing Shorts */
   let shortsUrlPollTimer = null;
 
@@ -224,7 +221,6 @@
     shortsSessionIds.clear();
 
     stopShortsUrlPolling();
-    cleanupShortsActiveObserver();
     document.removeEventListener('yt-navigate-finish', onShortsNavigateFinish);
     window.removeEventListener('load', onShortsNavigateFinish);
     if (shortsBootstrapTimer) {
@@ -437,13 +433,6 @@
     likeObserver = observer;
   }
 
-  function cleanupShortsActiveObserver() {
-    if (shortsActiveObserver) {
-      shortsActiveObserver.disconnect();
-      shortsActiveObserver = null;
-    }
-  }
-
   // ─── LIKE/DISLIKE DETECTION (WATCH PAGE) ─────────────────────────────────────
 
   function scheduleLikeDetection() {
@@ -518,13 +507,21 @@
       ? !!existing?.disliked
       : state.disliked;
 
+    // The indicator falls back to "watched" when a rating is removed from a
+    // video that watch progress had already marked.
+    const indicatorState = {
+      liked: state.liked,
+      disliked,
+      watchedByProgress: !!existing?.watchedByProgress,
+    };
+
     // Avoid unnecessary writes if nothing changed
     if (
       existing &&
       existing.liked === state.liked &&
       existing.disliked === disliked
     ) {
-      updateWatchIndicator(state.liked, disliked);
+      updateWatchIndicator(indicatorState);
       if (settings.enabled) scheduleCounterUpdate();
       return;
     }
@@ -554,7 +551,7 @@
     }
 
     // Update watch page indicator with fresh state
-    updateWatchIndicator(state.liked, disliked);
+    updateWatchIndicator(indicatorState);
     if (settings.enabled) scheduleCounterUpdate();
   }
 
@@ -639,6 +636,20 @@
 
     viewedIds.add(videoId);
     if (YTParser.isShortsPlayer()) shortsSessionIds.add(videoId);
+
+    // Surface the mark right away — unless the user has already moved on to
+    // another video while the write was in flight.
+    const playingId = YTParser.isShortsPlayer()
+      ? YTParser.getCurrentShortsVideoId()
+      : YTParser.getCurrentVideoId();
+    if (playingId === videoId) {
+      updateWatchIndicator({
+        liked: !!existing?.liked,
+        disliked: !!existing?.disliked,
+        watchedByProgress: true,
+      });
+    }
+
     if (settings.enabled) {
       processAllVisibleVideos();
       scheduleCounterUpdate();
@@ -666,8 +677,8 @@
   let _watchIndicatorTimer = null;
 
   /**
-   * Check storage and show indicator if current video was already rated.
-   * Called on page navigation to catch videos rated in a previous session.
+   * Check storage and show indicator if current video was already viewed.
+   * Called on page navigation to catch videos rated or watched in a previous session.
    */
   function scheduleWatchIndicatorCheck() {
     if (_watchIndicatorTimer) clearTimeout(_watchIndicatorTimer);
@@ -678,23 +689,32 @@
       if (!videoId) return;
       const record = await YTCheckStorage.getVideo(videoId);
       if (record && record.viewed) {
-        updateWatchIndicator(record.liked, record.disliked);
+        updateWatchIndicator(record);
       }
     }, 1500);
   }
 
   /**
-   * Inject or update the watch page indicator pill.
-   * @param {boolean} liked
-   * @param {boolean} disliked
+   * Indicator copy per kind of "viewed". A rating says more than watch time,
+   * so it wins when a video has both.
    */
-  function updateWatchIndicator(liked, disliked) {
+  const WATCH_INDICATOR_KINDS = {
+    liked:    { icon: '👍', label: 'liked',         text: 'alreadyRatedVideo' },
+    disliked: { icon: '👎', label: 'disliked',      text: 'alreadyRatedVideo' },
+    watched:  { icon: '▶',  label: 'watchedByTime', text: 'alreadyWatchedVideo' },
+  };
+
+  /**
+   * Inject or update the watch page indicator pill.
+   * @param {{ liked?: boolean, disliked?: boolean, watchedByProgress?: boolean }} state
+   */
+  function updateWatchIndicator({ liked, disliked, watchedByProgress }) {
     if (!settings.enabled) return;
     if (!YTParser.isWatchPage() && !YTParser.isShortsPlayer()) return;
 
-    const isViewed = liked || disliked;
+    const kindKey = liked ? 'liked' : disliked ? 'disliked' : watchedByProgress ? 'watched' : null;
 
-    if (!isViewed) {
+    if (!kindKey) {
       removeWatchIndicator();
       return;
     }
@@ -723,17 +743,15 @@
       anchor.insertAdjacentElement('afterbegin', _watchIndicatorEl);
     }
 
-    const icon   = liked ? '👍' : '👎';
-    const label  = liked ? YTCheckI18n.t('liked') : YTCheckI18n.t('disliked');
-    const cls    = liked ? 'ytcheck-watch--liked' : 'ytcheck-watch--disliked';
+    const kind = WATCH_INDICATOR_KINDS[kindKey];
     const shortsCls = isShorts ? 'ytcheck-shorts-player-indicator' : '';
 
-    _watchIndicatorEl.className = `ytcheck-watch-indicator ${cls} ${shortsCls}`;
+    _watchIndicatorEl.className = `ytcheck-watch-indicator ytcheck-watch--${kindKey} ${shortsCls}`;
     _watchIndicatorEl.style.setProperty('--ytcheck-color', settings.badgeColor);
     _watchIndicatorEl.innerHTML = `
       <span class="ytcheck-watch-check">✓</span>
-      <span class="ytcheck-watch-text">${YTCheckI18n.t('alreadyRatedVideo')}</span>
-      <span class="ytcheck-watch-pill">${icon} ${label}</span>
+      <span class="ytcheck-watch-text">${YTCheckI18n.t(kind.text)}</span>
+      <span class="ytcheck-watch-pill">${kind.icon} ${YTCheckI18n.t(kind.label)}</span>
     `;
   }
 
@@ -850,11 +868,7 @@
    * Process all currently visible video cards in the DOM.
    */
   function processAllVisibleVideos() {
-    const selector = YTParser.isShortsPlayer()
-      ? `${YTParser.VIDEO_ELEMENTS_SELECTOR},ytd-reel-video-renderer`
-      : YTParser.VIDEO_ELEMENTS_SELECTOR;
-
-    const elements = document.querySelectorAll(selector);
+    const elements = document.querySelectorAll(YTParser.VIDEO_ELEMENTS_SELECTOR);
     const toProcess = [];
     const seen = new Set();
     for (const el of elements) {
@@ -912,6 +926,8 @@
    * @param {Element[]} elements
    */
   function processVideoElements(elements) {
+    const likedListItems = [];
+
     for (const el of resolveCardRoots(elements)) {
       const data = YTParser.extractFromElement(el);
       if (!data) continue;
@@ -928,6 +944,7 @@
       }
 
       processedElements.add(el);
+      if (YTParser.isLikedListItem(el)) likedListItems.push(data);
 
       // Apply visual badge if video is viewed
       if (viewedIds.has(data.videoId)) {
@@ -940,8 +957,38 @@
       // Apply hide/highlight settings
       applyVisibilitySettings(el, data.videoId);
     }
+
+    if (likedListItems.length > 0) syncLikedListItems(likedListItems);
+
     // Update page counter after processing
     scheduleCounterUpdate();
+  }
+
+  /**
+   * Record as liked the videos listed in the user's "Liked videos" list.
+   * A Like given on the phone, the TV or another browser never goes through a
+   * watch page here, so those videos stayed unmarked until reopened on this
+   * computer. Only missing Likes are written; the badge then follows from the
+   * storage change, like any other rating.
+   * @param {Array<{videoId: string, title: string, channel: string, thumbnail: string, url: string}>} items
+   */
+  async function syncLikedListItems(items) {
+    for (const { videoId, title, channel, thumbnail, url } of items) {
+      if (!isContextAlive()) return;
+      const existing = await YTCheckStorage.getVideo(videoId);
+      if (existing?.liked) continue;
+
+      await YTCheckStorage.saveVideo({
+        videoId,
+        // Metadata read on the watch page comes from the player itself — keep it.
+        title: existing?.title || title,
+        channel: existing?.channel || channel,
+        thumbnail: existing?.thumbnail || thumbnail,
+        url: existing?.url || url,
+        liked: true,
+        disliked: false,
+      });
+    }
   }
 
   // ─── BADGE / OVERLAY INJECTION ────────────────────────────────────────────────
@@ -1066,10 +1113,14 @@
 
   /**
    * Re-apply all badges to currently visible videos (after settings change or refresh).
+   * @param {boolean} [reloadViewedIds] re-read the whole history. Only the
+   *   popup's explicit refresh asks for it: onStorageChanged already keeps
+   *   `viewedIds` in step, and a settings change (a counter drag included)
+   *   shouldn't cost a full read in every open tab.
    */
-  async function refreshAllBadges() {
+  async function refreshAllBadges(reloadViewedIds = false) {
     removeAllBadges();
-    viewedIds = await YTCheckStorage.getViewedIds();
+    if (reloadViewedIds) viewedIds = await YTCheckStorage.getViewedIds();
     settings = await YTCheckStorage.getSettings();
     applyI18nFromSettings();
     // Before the early return below: full titles don't depend on `enabled`.
@@ -1104,7 +1155,7 @@
     if (videoId) {
       const record = await YTCheckStorage.getVideo(videoId);
       if (record?.viewed) {
-        updateWatchIndicator(record.liked, record.disliked);
+        updateWatchIndicator(record);
       }
     }
 
@@ -1123,11 +1174,7 @@
   function onMessage(message, sender, sendResponse) {
     switch (message.action) {
       case 'refresh':
-        refreshAllBadges().then(() => sendResponse({ ok: true }));
-        return true;
-
-      case 'getStats':
-        YTCheckStorage.getStats().then((stats) => sendResponse(stats));
+        refreshAllBadges(true).then(() => sendResponse({ ok: true }));
         return true;
 
       case 'clearHistory':
@@ -1157,24 +1204,30 @@
     if (area === 'sync' && changes.settings) {
       refreshAllBadges();
     }
-    if (area === 'local' && changes.videos) {
-      // Re-sync viewed IDs
-      YTCheckStorage.getViewedIds().then((ids) => {
-        viewedIds = ids;
-        // Apply or remove badges for viewed/un-viewed videos
-        document.querySelectorAll('[data-ytcheck-id]').forEach((el) => {
-          const videoId = el.dataset.ytcheckId;
-          if (videoId) {
-            const isViewed = viewedIds.has(videoId);
-            if (isViewed && !el.dataset.ytcheckViewed) {
-              applyBadge(el, videoId);
-            } else if (!isViewed && el.dataset.ytcheckViewed) {
-              removeBadgeFromElement(el);
-            }
-          }
-        });
-        updatePageCounter();
+    if (area === 'local') {
+      // Each video is its own key, so the event carries exactly the records
+      // that changed (from this tab, another tab or the popup) — apply those
+      // instead of re-reading the whole history.
+      const changed = YTCheckStorage.getVideoChanges(changes);
+      if (changed.length === 0) return;
+
+      for (const { videoId, record } of changed) {
+        if (record?.viewed) viewedIds.add(videoId);
+        else viewedIds.delete(videoId);
+      }
+
+      const changedIds = new Set(changed.map(({ videoId }) => videoId));
+      document.querySelectorAll('[data-ytcheck-id]').forEach((el) => {
+        const videoId = el.dataset.ytcheckId;
+        if (!changedIds.has(videoId)) return;
+        const isViewed = viewedIds.has(videoId);
+        if (isViewed && !el.dataset.ytcheckViewed) {
+          applyBadge(el, videoId);
+        } else if (!isViewed && el.dataset.ytcheckViewed) {
+          removeBadgeFromElement(el);
+        }
       });
+      updatePageCounter();
     }
   }
 
